@@ -1,12 +1,24 @@
 <template>
   <div id="app">
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
+    <div id="nav">
+      <router-link to="/">Order</router-link> |
+      <router-link to="/Takeout">Takeout</router-link> |
+      <router-link to="/Book">Book</router-link>
+    </div>
     <router-view/>
+    <BottomBackground id="bg"/>
   </div>
 </template>
+
+<script>
+import BottomBackground from '../src/components/BottomBackground'
+
+export default {
+  components: {
+    BottomBackground
+  }
+}
+</script>
 
 <style>
 #app {
@@ -28,5 +40,14 @@
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+#bg {
+  position: absolute;
+  width: 1440px;
+  height: 85px;
+  left: 0px;
+  top: 939px;
+
+  background: #EFEFEF;
 }
 </style>

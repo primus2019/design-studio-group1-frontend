@@ -3,11 +3,14 @@
     <h2 id="menu-title">Menu</h2>
     <div id="menu-heading-list">
       <b-list-group
-        v-for="item in this.MenuHeading"
-        :key="item"
-        v-b-scrollspy:dish
+        v-for="(item, index) in MenuHeading"
+        :key="item.name"
+        v-b-scrollspy:dish=390
       >
-        <b-list-group-item class="d-flex justify-content-between align-items-center">
+        <b-list-group-item
+          class="d-flex justify-content-between align-items-center"
+          :href="'#dish-card-'+index"
+        >
           {{ item.name }}
           <b-badge>{{ item.orderNumber }}</b-badge>
         </b-list-group-item>
