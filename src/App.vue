@@ -49,5 +49,6 @@ export default {
   top: 939px;
 
   background: #EFEFEF;
+  z-index: -1;
 }
 </style>
