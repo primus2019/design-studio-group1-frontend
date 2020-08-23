@@ -25,14 +25,14 @@
     ></PromptInputGroup>
     <PromptInputGroup
       id="input-group-booking-guest-number"
-      prompt="Booking Time:"
+      prompt="Guest Number:"
       inputId="booking-guest-number-input"
       inputType="number"
       :inputMin="minBookingGuestNumber"
       :inputMax="maxBookingGuestNumber"
       :state="false"
-      placeholder="Select booking time"
-      inputLiveFeedback="Must select booking time"
+      placeholder="Select guest number"
+      inputLiveFeedback="Must select guest number"
       @input="handleBookingGuestNumberInput"
     ></PromptInputGroup>
     <CheckboxInputGroup
@@ -41,8 +41,14 @@
       inputId="show-booked-tables-input"
       @change="handleShowBookedTableInput"
     ></CheckboxInputGroup>
+    <CheckboxInputGroup
+      id="checkbox-input-show-unavailable-tables"
+      prompt="Show unavailable tables"
+      inputId="show-unavailable-tables-input"
+      @change="handleshowUnavailableTablesInput"
+    ></CheckboxInputGroup>
     <SearchTableButton/>
-    <TableList/>
+    <TableList :showBookedTables="showBookedTables" :showUnavailableTables="showUnavailableTables"/>
     <CheckBookingButton/>
     <PlaceBookingButton/>
   </div>
@@ -99,7 +105,8 @@ export default {
       BookingDate: null,
       BookingTime: null,
       BookingGuestNumber: '0',
-      showBookedTables: false
+      showBookedTables: false,
+      showUnavailableTables: false
     }
   },
   computed: {
@@ -138,10 +145,10 @@ export default {
     handleBookingDateInput (val) {
       this.BookingDate = val
     },
-    handleBookTimeInput (val) {
+    handleBookingTimeInput (val) {
       this.BookingTime = val
     },
-    handleBookGuestNumberInput (val) {
+    handleBookingGuestNumberInput (val) {
       this.BookingGuestNumber = val
     },
     handleShowBookedTableInput (val) {
@@ -149,6 +156,13 @@ export default {
         this.showBookedTables = true
       } else {
         this.showBookedTables = false
+      }
+    },
+    handleshowUnavailableTablesInput (val) {
+      if (val === 'checked') {
+        this.showUnavailableTables = true
+      } else {
+        this.showUnavailableTables = false
       }
     }
   }
@@ -174,6 +188,11 @@ export default {
 #checkbox-input-show-booked-tables {
   position: absolute;
   left: 855px;
-  top: 228px;
+  top: 210px;
+}
+#checkbox-input-show-unavailable-tables {
+  position: absolute;
+  left: 855px;
+  top: 240px;
 }
 </style>
