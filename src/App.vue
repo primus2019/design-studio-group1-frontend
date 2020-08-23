@@ -3,7 +3,7 @@
     <div id="nav">
       <router-link to="/">Order</router-link> |
       <router-link to="/Takeout">Takeout</router-link> |
-      <router-link to="/Book">Book</router-link>
+      <router-link to="/Booking">Booking</router-link>
     </div>
     <router-view/>
     <BottomBackground id="bg"/>

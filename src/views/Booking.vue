@@ -1,39 +1,39 @@
 <template>
-  <div class="Book">
+  <div class="Booking">
     <Logo/>
     <PromptInputGroup
-      id="input-group-book-date"
-      prompt="Book Date:"
-      inputId="book-date-input"
+      id="input-group-booking-date"
+      prompt="Booking Date:"
+      inputId="booking-date-input"
       inputType="date"
       :inputMin="minBookingDate"
       :inputMax="maxBookingDate"
       state="false"
-      placeholder="Select book date"
-      inputLiveFeedback="Must select book date"
-      @input="handleBookDateInput"
+      placeholder="Select booking date"
+      inputLiveFeedback="Must select booking date"
+      @input="handleBookingDateInput"
     ></PromptInputGroup>
     <PromptInputGroup
-      id="input-group-book-time"
-      prompt="Book Time:"
-      inputId="book-time-input"
+      id="input-group-booking-time"
+      prompt="Booking Time:"
+      inputId="booking-time-input"
       inputType="time"
       :state="validateTime"
-      placeholder="Select book time"
-      inputLiveFeedback="Must select book time"
-      @input="handleBookTimeInput"
+      placeholder="Select booking time"
+      inputLiveFeedback="Must select booking time"
+      @input="handleBookingTimeInput"
     ></PromptInputGroup>
     <PromptInputGroup
-      id="input-group-book-guest-number"
-      prompt="Book Time:"
-      inputId="book-guest-number-input"
+      id="input-group-booking-guest-number"
+      prompt="Booking Time:"
+      inputId="booking-guest-number-input"
       inputType="number"
       :inputMin="minBookingGuestNumber"
       :inputMax="maxBookingGuestNumber"
       :state="false"
-      placeholder="Select book time"
-      inputLiveFeedback="Must select book time"
-      @input="handleBookGuestNumberInput"
+      placeholder="Select booking time"
+      inputLiveFeedback="Must select booking time"
+      @input="handleBookingGuestNumberInput"
     ></PromptInputGroup>
     <CheckboxInputGroup
       id="checkbox-input-show-booked-tables"
@@ -58,7 +58,7 @@ import CheckBookingButton from '../components/CheckBookingButton'
 import PlaceBookingButton from '../components/PlaceBookingButton'
 
 export default {
-  name: 'Book',
+  name: 'Booking',
   components: {
     Logo,
     PromptInputGroup,
@@ -96,9 +96,9 @@ export default {
   },
   data () {
     return {
-      BookDate: null,
-      BookTime: null,
-      BookGuestNumber: '0',
+      BookingDate: null,
+      BookingTime: null,
+      BookingGuestNumber: '0',
       showBookedTables: false
     }
   },
@@ -135,14 +135,14 @@ export default {
         return false
       }
     },
-    handleBookDateInput (val) {
-      this.BookDate = val
+    handleBookingDateInput (val) {
+      this.BookingDate = val
     },
     handleBookTimeInput (val) {
-      this.BookTime = val
+      this.BookingTime = val
     },
     handleBookGuestNumberInput (val) {
-      this.BookGuestNumber = val
+      this.BookingGuestNumber = val
     },
     handleShowBookedTableInput (val) {
       if (val === 'checked') {
@@ -156,17 +156,17 @@ export default {
 </script>
 
 <style>
-#input-group-book-date {
+#input-group-booking-date {
   position: absolute;
   left: 85px;
   top: 99px;
 }
-#input-group-book-time {
+#input-group-booking-time {
   position: absolute;
   left: 85px;
   top: 193px;
 }
-#input-group-book-guest-number {
+#input-group-booking-guest-number {
   position: absolute;
   left: 669px;
   top: 99px;

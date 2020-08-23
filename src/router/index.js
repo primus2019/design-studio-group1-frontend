@@ -11,12 +11,12 @@ const routes = [
     component: Order
   },
   {
-    path: '/Book',
-    name: 'Book',
+    path: '/Booking',
+    name: 'Booking',
     // route level code-splitting
     // this generates a separate chunk (Book.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "Book" */ '../views/Book.vue')
+    component: () => import(/* webpackChunkName: "Book" */ '../views/Booking.vue')
   },
   {
     path: '/Takeout',
