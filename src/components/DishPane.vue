@@ -8,25 +8,26 @@
         :id="'dish-card-'+dishClassIndex"
         deck
       >
-        <div
+        <b-container
+          fluid
           v-for="(singleDish, singleDishIndex) in dishClass"
           :key="singleDishIndex"
         >
-        <b-card
-          class="dish-card"
-          img-left
-          img-src="../assets/logo.png"
-          img-alt="dish-pic"
-          :title="singleDish.name"
-        >
-          <b-card-text>{{ singleDish.description }}</b-card-text>
-          <h3>{{ singleDish.price }}</h3>
-          <b-button-group>
-          <b-button>-</b-button>
-          <b-button>+</b-button>
-          </b-button-group>
-        </b-card>
-        </div>
+          <b-card
+            class="dish-card"
+            img-left
+            img-src="../assets/logo.png"
+            img-alt="dish-pic"
+            :title="singleDish.name"
+          >
+            <b-card-text>{{ singleDish.description }}</b-card-text>
+            <h3>{{ singleDish.price }}</h3>
+            <b-button-group>
+            <b-button>-</b-button>
+            <b-button>+</b-button>
+            </b-button-group>
+          </b-card>
+        </b-container>
       </b-card-group>
     </div>
   </div>
@@ -75,17 +76,12 @@ export default {
 
 <style>
 #dish {
-  position: absolute;
-  width: 887px;
-  height: 820px;
-  left: 467px;
-  top: 111px;
+  height: 75vh;
   overflow-x: hidden;
   overflow-y: auto;
 }
 .dish-card {
   position: relative;
-  width: 887px;
-  height: 200px;
+  height: 25vh;
 }
 </style>

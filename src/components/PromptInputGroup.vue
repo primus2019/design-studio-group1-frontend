@@ -68,7 +68,7 @@ export default {
 
 <style>
 .prompt-input-group {
-  width: 540px;
-  height: 70px;
+  /* width: 540px;
+  height: 70px; */
 }
 </style>

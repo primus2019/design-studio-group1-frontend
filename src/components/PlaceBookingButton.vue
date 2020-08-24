@@ -16,12 +16,15 @@ export default {
 </script>
 
 <style>
+.place-booking {
+  vertical-align: middle;
+}
 .place-booking-button {
-  position: absolute;
+  /* position: absolute; */
   width: 144.02px;
   height: 38px;
-  left: 1252px;
-  top: 963px;
+  /* left: 1252px;
+  top: 963px; */
   z-index: 1;
 }
 </style>

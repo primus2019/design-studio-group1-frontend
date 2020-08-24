@@ -1,33 +1,30 @@
 <template>
   <div class="Takeout">
     <Logo :logoDir="takeoutLogoDir"/>
-    <OrderBrief/>
+    <OrderDetail/>
     <Search/>
     <MenuHeading/>
     <DishPane/>
-    <CheckOrderButton/>
     <PlaceOrderButton/>
   </div>
 </template>
 
 <script>
 import Logo from '../components/Logo'
-import OrderBrief from '../components/OrderBrief'
+import OrderDetail from '../components/OrderDetail'
 import Search from '../components/Search'
 import MenuHeading from '../components/MenuHeading'
 import DishPane from '../components/DishPane'
-import CheckOrderButton from '../components/CheckOrderButton'
 import PlaceOrderButton from '../components/PlaceOrderButton'
 
 export default {
   name: 'Takeout',
   components: {
     Logo,
-    OrderBrief,
+    OrderDetail,
     Search,
     MenuHeading,
     DishPane,
-    CheckOrderButton,
     PlaceOrderButton
   },
   data () {

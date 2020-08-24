@@ -1,6 +1,13 @@
 <template>
   <div>
-    <b-button id="place-order-button" variant="success">Place Orders</b-button>
+    <b-button
+      id="place-order-button"
+      variant="outline-success"
+      pill
+      class="h2"
+    >
+      Place Orders
+    </b-button>
   </div>
 </template>
 
@@ -12,10 +19,10 @@ export default {
 
 <style>
 #place-order-button {
-  position: absolute;
+  /* position: absolute;
   width: 167px;
   height: 38px;
   left: 1251px;
-  top: 963px;
+  top: 963px; */
 }
 </style>

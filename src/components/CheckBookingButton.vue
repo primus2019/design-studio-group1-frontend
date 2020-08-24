@@ -17,11 +17,11 @@ export default {
 
 <style>
 .check-booking-button {
-  position: absolute;
+  /* position: absolute; */
   width: 151px;
   height: 38px;
-  left: 1080px;
-  top: 963px;
+  /* left: 1080px;
+  top: 963px; */
   z-index: 1;
 }
 </style>

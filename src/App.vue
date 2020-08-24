@@ -6,16 +6,16 @@
       <router-link to="/Booking">Booking</router-link>
     </div>
     <router-view/>
-    <BottomBackground id="bg"/>
+    <!-- <BottomBackground id="bg"/> -->
   </div>
 </template>
 
 <script>
-import BottomBackground from '../src/components/BottomBackground'
+// import BottomBackground from '../src/components/BottomBackground'
 
 export default {
   components: {
-    BottomBackground
+    // BottomBackground
   }
 }
 </script>

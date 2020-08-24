@@ -1,6 +1,5 @@
 <template>
   <div id="menu-box">
-    <h2 id="menu-title">Menu</h2>
     <div id="menu-heading-list">
       <b-list-group
         v-for="(item, index) in MenuHeading"
@@ -40,17 +39,17 @@ export default {
 
 <style>
 #menu-title {
-  position: absolute;
+  /* position: absolute;
   width: 62px;
   height: 26px;
   left: 38px;
-  top: 103px;
+  top: 103px; */
 
-  font-family: Ubuntu;
+  /* font-family: Ubuntu;
   font-style: normal;
   font-weight: normal;
   font-size: 24px;
-  line-height: 26px;
+  line-height: 26px; */
   /* identical to box height, or 108% */
 
   display: flex;
@@ -59,10 +58,10 @@ export default {
   color: #373A3C;
 }
 #menu-heading-list {
-  position: absolute;
+  /* position: absolute;
   width: 400px;
   height: 379px;
   left: 38px;
-  top: 139px;
+  top: 139px; */
 }
 </style>

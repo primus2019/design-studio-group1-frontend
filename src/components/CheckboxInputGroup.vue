@@ -40,7 +40,7 @@ export default {
 
 <style>
 .check-box-input {
-  position: absolute;
+  /* position: absolute; */
   width: 160px;
   height: 24px;
 }

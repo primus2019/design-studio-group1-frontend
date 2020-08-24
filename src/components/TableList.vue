@@ -149,16 +149,16 @@ export default {
 
 <style>
 .table-list {
-  position: absolute;
-  width: 1247px;
-  height: 621px;
-  left: 77px;
-  top: 297px;
+  /* position: absolute; */
+  /* width: 1247px;
+  height: 621px; */
+  /* left: 77px;
+  top: 297px; */
   overflow-y: auto;
   overflow-x: hidden;
 }
 .table-table {
-  position: absolute;
+  /* position: absolute; */
 }
 .table-list-operation-button {
   width: 100px;

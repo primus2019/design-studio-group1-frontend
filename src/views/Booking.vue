@@ -1,56 +1,89 @@
 <template>
   <div class="Booking">
-    <Logo :logoDir="bookingLogoDir"/>
-    <PromptInputGroup
-      id="input-group-booking-date"
-      prompt="Booking Date:"
-      inputId="booking-date-input"
-      inputType="date"
-      :inputMin="minBookingDate"
-      :inputMax="maxBookingDate"
-      state="false"
-      placeholder="Select booking date"
-      inputLiveFeedback="Must select booking date"
-      @input="handleBookingDateInput"
-    ></PromptInputGroup>
-    <PromptInputGroup
-      id="input-group-booking-time"
-      prompt="Booking Time:"
-      inputId="booking-time-input"
-      inputType="time"
-      :state="validateTime"
-      placeholder="Select booking time"
-      inputLiveFeedback="Must select booking time"
-      @input="handleBookingTimeInput"
-    ></PromptInputGroup>
-    <PromptInputGroup
-      id="input-group-booking-guest-number"
-      prompt="Guest Number:"
-      inputId="booking-guest-number-input"
-      inputType="number"
-      :inputMin="minBookingGuestNumber"
-      :inputMax="maxBookingGuestNumber"
-      :state="false"
-      placeholder="Select guest number"
-      inputLiveFeedback="Must select guest number"
-      @input="handleBookingGuestNumberInput"
-    ></PromptInputGroup>
-    <CheckboxInputGroup
-      id="checkbox-input-show-booked-tables"
-      prompt="Show booked tables"
-      inputId="show-booked-tables-input"
-      @change="handleShowBookedTableInput"
-    ></CheckboxInputGroup>
-    <CheckboxInputGroup
-      id="checkbox-input-show-unavailable-tables"
-      prompt="Show unavailable tables"
-      inputId="show-unavailable-tables-input"
-      @change="handleshowUnavailableTablesInput"
-    ></CheckboxInputGroup>
-    <SearchTableButton/>
-    <TableList :showBookedTables="showBookedTables" :showUnavailableTables="showUnavailableTables"/>
-    <CheckBookingButton/>
-    <PlaceBookingButton/>
+    <b-container :fluid="bookingFluid">
+      <b-row class="mb-5" align-v="center">
+        <Logo :logoDir="bookingLogoDir"/>
+      </b-row>
+      <b-row class="mt-3 mb-3" align-h="center">
+        <b-col cols="6">
+          <PromptInputGroup
+            id="input-group-booking-date"
+            prompt="Booking Date:"
+            inputId="booking-date-input"
+            inputType="date"
+            :inputMin="minBookingDate"
+            :inputMax="maxBookingDate"
+            state="false"
+            placeholder="Select booking date"
+            inputLiveFeedback="Must select booking date"
+            @input="handleBookingDateInput"
+          ></PromptInputGroup>
+        </b-col>
+        <b-col cols="6">
+          <PromptInputGroup
+            id="input-group-booking-time"
+            prompt="Booking Time:"
+            inputId="booking-time-input"
+            inputType="time"
+            :state="validateTime"
+            placeholder="Select booking time"
+            inputLiveFeedback="Must select booking time"
+            @input="handleBookingTimeInput"
+          ></PromptInputGroup>
+        </b-col>
+      </b-row>
+      <b-row class="mt-3 mb-3" align-h="center" align-v="end">
+        <b-col cols="6">
+          <PromptInputGroup
+            id="input-group-booking-guest-number"
+            prompt="Guest Number:"
+            inputId="booking-guest-number-input"
+            inputType="number"
+            :inputMin="minBookingGuestNumber"
+            :inputMax="maxBookingGuestNumber"
+            :state="false"
+            placeholder="Select guest number"
+            inputLiveFeedback="Must select guest number"
+            @input="handleBookingGuestNumberInput"
+          ></PromptInputGroup>
+        </b-col>
+        <b-col cols="2">
+          <b-row align-h="start" class="ml-auto">
+            <SearchTableButton/>
+          </b-row>
+        </b-col>
+        <b-col cols="3">
+          <b-row align-h="start">
+            <CheckboxInputGroup
+              id="checkbox-input-show-booked-tables"
+              prompt="Show booked tables"
+              inputId="show-booked-tables-input"
+              @change="handleShowBookedTableInput"
+            ></CheckboxInputGroup>
+            <CheckboxInputGroup
+              id="checkbox-input-show-unavailable-tables"
+              prompt="Show unavailable tables"
+              inputId="show-unavailable-tables-input"
+              @change="handleshowUnavailableTablesInput"
+            ></CheckboxInputGroup>
+          </b-row>
+        </b-col>
+        <b-col cols="1"/>
+      </b-row>
+      <b-row>
+        <b-col>
+          <TableList :showBookedTables="showBookedTables" :showUnavailableTables="showUnavailableTables"/>
+        </b-col>
+      </b-row>
+      <b-row class="bg-light pt-3 pb-2" align-h="end">
+        <b-col cols="2">
+          <CheckBookingButton/>
+        </b-col>
+        <b-col cols="2">
+          <PlaceBookingButton/>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
@@ -107,7 +140,8 @@ export default {
       BookingTime: null,
       BookingGuestNumber: '0',
       showBookedTables: false,
-      showUnavailableTables: false
+      showUnavailableTables: false,
+      bookingFluid: 'xl'
     }
   },
   computed: {
@@ -171,7 +205,7 @@ export default {
 </script>
 
 <style>
-#input-group-booking-date {
+/* #input-group-booking-date {
   position: absolute;
   left: 85px;
   top: 99px;
@@ -195,5 +229,8 @@ export default {
   position: absolute;
   left: 855px;
   top: 240px;
-}
+} */
+/* .logo-row {
+  height: 5vh;
+} */
 </style>
