@@ -1,6 +1,6 @@
 <template>
   <div class="Takeout">
-    <Logo/>
+    <Logo :logoDir="takeoutLogoDir"/>
     <OrderBrief/>
     <Search/>
     <MenuHeading/>
@@ -29,6 +29,11 @@ export default {
     DishPane,
     CheckOrderButton,
     PlaceOrderButton
+  },
+  data () {
+    return {
+      takeoutLogoDir: 'takeout.png'
+    }
   }
 }
 </script>

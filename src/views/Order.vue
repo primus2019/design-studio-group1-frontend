@@ -1,6 +1,6 @@
 <template>
   <div class="order">
-    <Logo/>
+    <Logo :logoDir="orderLogoDir"/>
     <OrderBrief/>
     <Search/>
     <MenuHeading/>
@@ -29,6 +29,11 @@ export default {
     DishPane,
     CheckOrderButton,
     PlaceOrderButton
+  },
+  data () {
+    return {
+      orderLogoDir: 'order.png'
+    }
   }
 }
 </script>

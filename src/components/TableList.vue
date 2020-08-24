@@ -155,6 +155,7 @@ export default {
   left: 77px;
   top: 297px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .table-table {
   position: absolute;

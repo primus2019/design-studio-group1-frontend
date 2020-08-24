@@ -1,6 +1,6 @@
 <template>
   <div class="Booking">
-    <Logo/>
+    <Logo :logoDir="bookingLogoDir"/>
     <PromptInputGroup
       id="input-group-booking-date"
       prompt="Booking Date:"
@@ -102,6 +102,7 @@ export default {
   },
   data () {
     return {
+      bookingLogoDir: 'booking.png',
       BookingDate: null,
       BookingTime: null,
       BookingGuestNumber: '0',
