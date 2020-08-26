@@ -17,6 +17,7 @@
             placeholder="Select booking date"
             inputLiveFeedback="Must select booking date"
             @input="handleBookingDateInput"
+            :reset="inputGroupBookingDateReset"
           ></PromptInputGroup>
         </b-col>
         <b-col cols="6">
@@ -29,6 +30,7 @@
             placeholder="Select booking time"
             inputLiveFeedback="Must select booking time"
             @input="handleBookingTimeInput"
+            :reset="inputGroupBookingTimeReset"
           ></PromptInputGroup>
         </b-col>
       </b-row>
@@ -45,6 +47,7 @@
             placeholder="Select guest number"
             inputLiveFeedback="Must select guest number"
             @input="handleBookingGuestNumberInput"
+            :reset="inputGroupBookingGuestNumberReset"
           ></PromptInputGroup>
         </b-col>
         <b-col cols="2">
@@ -72,12 +75,17 @@
       </b-row>
       <b-row>
         <b-col>
-          <TableList :showBookedTables="showBookedTables" :showUnavailableTables="showUnavailableTables"/>
+          <TableList
+            :showBookedTables="showBookedTables"
+            :showUnavailableTables="showUnavailableTables"
+            :tableList="tables"
+            @operation="handleOperation"
+          ></TableList>
         </b-col>
       </b-row>
       <b-row class="bg-light pt-3 pb-2" align-h="end">
         <b-col cols="2">
-          <CheckBookingButton/>
+          <CheckBooking :operations="operations"/>
         </b-col>
         <b-col cols="2">
           <PlaceBookingButton/>
@@ -93,8 +101,9 @@ import PromptInputGroup from '../components/PromptInputGroup'
 import SearchTableButton from '../components/SearchTableButton'
 import CheckboxInputGroup from '../components/CheckboxInputGroup'
 import TableList from '../components/TableList'
-import CheckBookingButton from '../components/CheckBookingButton'
+import CheckBooking from '../components/CheckBooking'
 import PlaceBookingButton from '../components/PlaceBookingButton'
+import axios from 'axios'
 
 export default {
   name: 'Booking',
@@ -104,17 +113,17 @@ export default {
     SearchTableButton,
     CheckboxInputGroup,
     TableList,
-    CheckBookingButton,
+    CheckBooking,
     PlaceBookingButton
   },
   props: {
-    minBookingTime: {
-      type: String,
-      default: '8:00'
+    minBookingHour: {
+      type: Number,
+      default: 8
     },
-    maxBookingTime: {
-      type: String,
-      default: '20:00'
+    maxBookingHour: {
+      type: Number,
+      default: 20
     },
     minBookingDays: {
       type: Number,
@@ -138,10 +147,28 @@ export default {
       bookingLogoDir: 'booking.png',
       BookingDate: null,
       BookingTime: null,
-      BookingGuestNumber: '0',
+      BookingGuestNumber: null,
       showBookedTables: false,
       showUnavailableTables: false,
-      bookingFluid: 'xl'
+      bookingFluid: 'xl',
+      tables: [
+        { table_id: 0, book_status: 0, table_content: 1 },
+        { table_id: 1, book_status: 0, table_content: 2 },
+        { table_id: 2, book_status: 1, table_content: 3 },
+        { table_id: 3, book_status: 0, table_content: 5 },
+        { table_id: 4, book_status: 1, table_content: 10 }
+      ],
+      inputGroupBookingDateReset: false,
+      inputGroupBookingTimeReset: false,
+      inputGroupBookingGuestNumberReset: false,
+      operations: {
+        book: [],
+        merge: [],
+        split: [],
+        open: [],
+        shut: [],
+        cancel: []
+      }
     }
   },
   computed: {
@@ -167,22 +194,42 @@ export default {
     }
   },
   methods: {
-    validateTime () {
-      const minTime = Date.parse(this.minBookingTime)
-      const maxTime = Date.parse(this.maxBookingTime)
-      const tmpBookTime = Date.parse(this.BookTime)
-      if (tmpBookTime >= minTime && tmpBookTime <= maxTime) {
+    prompt (text) {
+      console.log('Prompter:', text)
+    },
+    validateTime (val) {
+      const tmpBookHour = parseInt(val.substring(0, 2))
+      if (tmpBookHour >= this.minBookingHour && tmpBookHour <= this.maxBookingHour) {
         return true
       } else {
         return false
       }
     },
+    // The validation has been implemented inside the component
     handleBookingDateInput (val) {
-      this.BookingDate = val
+      var tmpBookingDate = new Date(val)
+      var dd = String(tmpBookingDate.getDate()).padStart(2, '0')
+      var mm = String(tmpBookingDate.getMonth() + 1).padStart(2, '0')
+      var yyyy = tmpBookingDate.getFullYear()
+      this.BookingDate = yyyy + mm + dd
+      console.log('this.BookingDate', this.BookingDate)
     },
+    // The validation cannot be implemented inside time input
     handleBookingTimeInput (val) {
-      this.BookingTime = val
+      if (!this.validateTime(val)) {
+        this.prompt('Invalid time selection')
+        this.inputGroupBookingTimeReset = true
+        this.$nextTick(() => {
+          this.inputGroupBookingTimeReset = false
+        })
+      }
+      var hh = val.substring(0, 2)
+      var mm = val.substring(3, 5)
+      mm = String(Number.parseInt(mm) / 10 * 10).padStart(2, '0')
+      var ss = '00'
+      this.BookingTime = hh + ':' + mm + ':' + ss
     },
+    // The validation has been implemented inside the component
     handleBookingGuestNumberInput (val) {
       this.BookingGuestNumber = val
     },
@@ -198,6 +245,35 @@ export default {
         this.showUnavailableTables = true
       } else {
         this.showUnavailableTables = false
+      }
+    },
+    updateTables (tables) {
+      this.tables = this.extendTableList(tables)
+    },
+    extendTableList (tables) {
+      this.tables = tables.map(table => {
+        table.table_type = (table.table_content > 4) + (table.table_content > 10)
+        return table
+      })
+    },
+    handleOperation (operation, tableId) {
+      if (this.operations[operation].includes(tableId)) {
+        this.prompt('Duplicated operation!', operation, tableId)
+      } else {
+        this.operations[operation].push(tableId)
+        console.log('parent operations updated', operation, tableId)
+      }
+    },
+    // TODO: /api/review_table: request/response
+    reviewTable () {
+      if (this.BookingDate && this.BookingTime && this.BookingGuestNumber) {
+        axios({
+          method: 'get',
+          url: 'http://localhost:8081/api/review_table',
+          data: { book_time: this.BookingDate + ' ' + this.BookingTime }
+        })
+          .then(res => this.updateTables(res.book_status))
+          .catch(err => console.log(err))
       }
     }
   }

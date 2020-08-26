@@ -12,6 +12,7 @@
       :state="inputState"
       :placeholder="placeholder"
       :aria-describedby="this.inputId+'inputLiveFeedback'"
+      v-if="inputShow"
     ></b-form-input>
     <b-form-invalid-feedback :id="this.inputId+'inputLiveFeedback'">
       {{ this.inputLiveFeedback}}
@@ -23,6 +24,10 @@
 export default {
   name: 'PromptInputGroup',
   props: {
+    reset: {
+      type: Boolean,
+      default: false
+    },
     inputId: {
       type: String
     },
@@ -53,22 +58,31 @@ export default {
   },
   data () {
     return {
-      inputModel: null
+      inputModel: null,
+      inputShow: true
     }
   },
   watch: {
     inputModel: {
-      handler: function (val, oldVar) {
-        this.$emit('input', val)
+      handler: function (val) {
+        console.log('child component watcher: inputModel change', this.inputModel)
+        if (val !== null) {
+          this.$emit('input', val)
+        }
+      }
+    },
+    reset: {
+      handler: function () {
+        console.log('child component watcher: reset change', this.reset)
+        if (this.reset) {
+          this.inputModel = null
+          this.inputShow = false
+          this.$nextTick(() => {
+            this.inputShow = true
+          })
+        }
       }
     }
   }
 }
 </script>
-
-<style>
-.prompt-input-group {
-  /* width: 540px;
-  height: 70px; */
-}
-</style>

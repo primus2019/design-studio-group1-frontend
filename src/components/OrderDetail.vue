@@ -8,7 +8,7 @@
     button-size="lg"
   >
     <b-list-group v-for="dish in dishes" :key="dish.dish_id">
-      <b-list-group-item>
+      <b-list-group-item  v-if="dish.orderCount !== 0">
         <b-container>
           <b-row class="mb-1">
             <h4>{{ dish.name }}</h4>
@@ -20,7 +20,12 @@
             <b-col cols="5"/>
             <b-col cols="1">
               <b-row align-h="center" align-v="center">
-                <b-button variant="outline-primary" class="h5">
+                <b-button
+                  variant="outline-primary"
+                  class="h5"
+                  @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
+                  :disabled="dish.orderCount === 0"
+                >
                   <b-icon icon="dash"/>
                 </b-button>
               </b-row>
@@ -32,7 +37,11 @@
             </b-col>
             <b-col cols="1">
               <b-row align-h="center" align-v="center">
-                <b-button variant="primary" class="h5">
+                <b-button
+                  variant="primary"
+                  class="h5"
+                  @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
+                >
                   <b-icon icon="plus"/>
                 </b-button>
               </b-row>
@@ -48,10 +57,6 @@
 export default {
   name: 'OrderDetail',
   props: {
-    isMobile: {
-      type: Boolean,
-      default: false
-    },
     dishes: {
       type: Array,
       default: () => [
@@ -62,25 +67,31 @@ export default {
         { dish_id: 4, name: '红烧肉5', price: 14.00, type: '肉类5', orderCount: 1 }
       ]
     },
+    isMobile: {
+      type: Boolean,
+      default: false
+    },
     orderDetailModalId: {
       type: String,
       default: 'orderDetailModalId'
     }
   },
+  data () {
+    return {
+      localDishes: this.dishes
+    }
+  },
   methods: {
+    changeOrderCount (dishId, newOrderCount) {
+      this.dishes.forEach((dish) => {
+        if (dish.dish_id === dishId) {
+          dish.orderCount = newOrderCount
+        }
+      })
+      this.$emit('change', dishId, newOrderCount)
+    }
   },
   computed: {
   }
 }
 </script>
-
-<style>
-#order-brief {
-  /* position: absolute;
-  width: 455px;
-  height: 38px;
-  left: 686px;
-  top: 963px;
-  background: #C4C4C4; */
-}
-</style>

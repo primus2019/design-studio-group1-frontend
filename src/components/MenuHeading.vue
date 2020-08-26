@@ -2,16 +2,16 @@
   <div id="menu-box">
     <div id="menu-heading-list">
       <b-list-group
-        v-for="(item, index) in MenuHeading"
-        :key="item.name"
+        v-for="item in dishTypes"
+        :key="item.type"
         v-b-scrollspy:dish=390
       >
         <b-list-group-item
           class="d-flex justify-content-between align-items-center"
-          :href="'#dish-card-'+index"
+          :href="'#dish-card-'+item.type"
         >
-          {{ item.name }}
-          <b-badge>{{ item.orderNumber }}</b-badge>
+          {{ item.typeName }}
+          <b-badge>{{ item.orderCount }}</b-badge>
         </b-list-group-item>
       </b-list-group>
     </div>
@@ -21,17 +21,34 @@
 <script>
 export default {
   name: 'MenuHeading',
-  data () {
-    return {
-      MenuHeading: [
-        { name: 'Vegetables', orderNumber: 10 },
-        { name: 'Fruits', orderNumber: 10 },
-        { name: 'Meat and Pourltry', orderNumber: 10 },
-        { name: 'Fish and Seafoods', orderNumber: 10 },
-        { name: 'Dairy Foods', orderNumber: 10 },
-        { name: 'Grians, Beans and Nuts', orderNumber: 10 },
-        { name: 'Other\'s', orderNumber: 10 }
+  props: {
+    dishes: {
+      type: Array,
+      default: () => [
+        { dish_id: 0, name: '红烧肉1', price: 10.00, type: 0, orderCount: 1, typeName: '肉类' },
+        { dish_id: 1, name: '红烧肉2', price: 11.00, type: 1, orderCount: 1, typeName: '肉类' },
+        { dish_id: 2, name: '红烧肉3', price: 12.00, type: 2, orderCount: 1, typeName: '肉类' },
+        { dish_id: 3, name: '红烧肉4', price: 13.00, type: 3, orderCount: 1, typeName: '肉类' },
+        { dish_id: 4, name: '红烧肉5', price: 14.00, type: 4, orderCount: 1, typeName: '肉类' }
       ]
+    }
+  },
+  computed: {
+    dishTypes () {
+      var tmpDishTypes = []
+      this.dishes.slice().forEach((dish) => {
+        var dup = false
+        tmpDishTypes.map((uniDish) => {
+          if (dish.type === uniDish.type) {
+            dup = true
+            uniDish.orderCount += dish.orderCount
+          }
+        })
+        if (!dup) {
+          tmpDishTypes.push(JSON.parse(JSON.stringify(dish)))
+        }
+      })
+      return tmpDishTypes
     }
   }
 }
