@@ -1,21 +1,23 @@
 <template>
   <div class="search-table">
-    <b-button id="search-table-button" variant="outline-dark" size="lg">Search</b-button>
+    <b-button
+      id="search-table-button"
+      variant="outline-dark"
+      size="lg"
+      @click="search"
+    >
+      Search
+    </b-button>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'SearchTableButton'
+  name: 'SearchTableButton',
+  methods: {
+    search () {
+      this.$emit('search')
+    }
+  }
 }
 </script>
-
-<style>
-#search-table-button {
-  /* position: absolute; */
-  /* width: 156px;
-  height: 52px; */
-  /* left: 669px;
-  top: 211px; */
-}
-</style>

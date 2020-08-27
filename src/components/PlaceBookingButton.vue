@@ -1,17 +1,44 @@
 <template>
   <div class="place-booking">
-    <b-button
+    <b-dropdown
       class="place-booking-button"
       variant="outline-success"
+      text="Commit operations"
     >
-      Place Bookings
-    </b-button>
+      <div
+        v-for="operation in operationList"
+        :key="operation"
+      >
+        <b-dropdown-item
+          @click="commit(operation)"
+        >
+          {{ operation }}
+        </b-dropdown-item>
+      </div>
+    </b-dropdown>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'PlaceBookingButton'
+  name: 'PlaceBookingButton',
+  data () {
+    return {
+      operationList: [
+        'book',
+        'cancel',
+        'open',
+        'merge',
+        'split'
+      ]
+    }
+  },
+  methods: {
+    commit (operation) {
+      this.$emit('commit', operation)
+      console.log('child component emit commit', operation)
+    }
+  }
 }
 </script>
 

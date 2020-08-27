@@ -62,7 +62,8 @@
         </b-row>
       </template>
       <template v-slot:cell(book_status)="singleTable">
-        {{ bookStatusDict[singleTable.item.book_status] }}
+        <!-- {{ bookStatusDict[singleTable.item.book_status] }} -->
+        {{ singleTable.item.book_status }}
       </template>
     </b-table>
   </div>
@@ -73,24 +74,7 @@ export default {
   name: 'TableList',
   props: {
     tableList: {
-      type: Array,
-      default: () => [
-        { table_id: 0, table_content: 4, book_status: 0 },
-        { table_id: 1, table_content: 4, book_status: 0 },
-        { table_id: 2, table_content: 4, book_status: 1 },
-        { table_id: 3, table_content: 4, book_status: 1 },
-        { table_id: 4, table_content: 4, book_status: 1 },
-        { table_id: 5, table_content: 4, book_status: 1 },
-        { table_id: 6, table_content: 4, book_status: 0 },
-        { table_id: 7, table_content: 4, book_status: 0 },
-        { table_id: 8, table_content: 4, book_status: 0 },
-        { table_id: 9, table_content: 4, book_status: 1 },
-        { table_id: 10, table_content: 4, book_status: 0 },
-        { table_id: 11, table_content: 4, book_status: 0 },
-        { table_id: 12, table_content: 4, book_status: 0 },
-        { table_id: 13, table_content: 4, book_status: 0 },
-        { table_id: 14, table_content: 4, book_status: 1 }
-      ]
+      type: Array
     },
     showBookedTables: {
       type: Boolean,
@@ -117,7 +101,8 @@ export default {
       // },
       bookStatusDict: {
         0: '不可选', 1: '可选'
-      }
+      },
+      localTableList: null
     }
   },
   methods: {
@@ -132,22 +117,26 @@ export default {
       console.log('child component update operation', operation, tableId)
       this.$emit('operation', operation, tableId)
     }
+  },
+  watch: {
+    tableList: {
+      deep: true,
+      handler: function (val) {
+        this.localTableList = val
+      }
+    }
+  },
+  mounted () {
+    this.localTableList = this.tableList
+    console.log('child component mounted localTableList', this.localTableList)
   }
 }
 </script>
 
 <style>
 .table-list {
-  /* position: absolute; */
-  /* width: 1247px;
-  height: 621px; */
-  /* left: 77px;
-  top: 297px; */
   overflow-y: auto;
   overflow-x: hidden;
-}
-.table-table {
-  /* position: absolute; */
 }
 .table-list-operation-button {
   width: 100px;

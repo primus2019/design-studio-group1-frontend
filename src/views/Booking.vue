@@ -52,7 +52,7 @@
         </b-col>
         <b-col cols="2">
           <b-row align-h="start" class="ml-auto">
-            <SearchTableButton/>
+            <SearchTableButton @search="reviewTable"/>
           </b-row>
         </b-col>
         <b-col cols="3">
@@ -85,13 +85,20 @@
       </b-row>
       <b-row class="bg-light pt-3 pb-2" align-h="end">
         <b-col cols="2">
-          <CheckBooking :operations="operations"/>
+          <CheckBooking :operations="operations" @remove="removeOperations"/>
         </b-col>
         <b-col cols="2">
-          <PlaceBookingButton/>
+          <PlaceBookingButton @commit="handleCommitOperations"/>
         </b-col>
       </b-row>
     </b-container>
+    <Prompter prompterId="bookingPrompter" :promptText="promptText" @reset="promptText=null"/>
+    <PromptInput
+      id="cancelBookingPromptInput"
+      promptInputType="number"
+      promptInputText="Enter book serial"
+      @submit="handleCancelBooking"
+    ></PromptInput>
   </div>
 </template>
 
@@ -104,6 +111,8 @@ import TableList from '../components/TableList'
 import CheckBooking from '../components/CheckBooking'
 import PlaceBookingButton from '../components/PlaceBookingButton'
 import axios from 'axios'
+import Prompter from '../components/Prompter'
+import PromptInput from '../components/PromptInput'
 
 export default {
   name: 'Booking',
@@ -114,7 +123,9 @@ export default {
     CheckboxInputGroup,
     TableList,
     CheckBooking,
-    PlaceBookingButton
+    PlaceBookingButton,
+    Prompter,
+    PromptInput
   },
   props: {
     minBookingHour: {
@@ -151,24 +162,29 @@ export default {
       showBookedTables: false,
       showUnavailableTables: false,
       bookingFluid: 'xl',
-      tables: [
-        { table_id: 0, book_status: 0, table_content: 1 },
-        { table_id: 1, book_status: 0, table_content: 2 },
-        { table_id: 2, book_status: 1, table_content: 3 },
-        { table_id: 3, book_status: 0, table_content: 5 },
-        { table_id: 4, book_status: 1, table_content: 10 }
-      ],
+      tables: null,
       inputGroupBookingDateReset: false,
       inputGroupBookingTimeReset: false,
       inputGroupBookingGuestNumberReset: false,
       operations: {
         book: [],
-        merge: [],
-        split: [],
+        cancel: [],
         open: [],
-        shut: [],
-        cancel: []
-      }
+        merge: [],
+        split: []
+        // close: [],
+        // shut: []
+      },
+      commitOperationApiDict: {
+        book: '/api/add_book',
+        cancel: '/api/cancel_book',
+        open: '/api/open_table',
+        merge: '/api/merge_table',
+        split: '/api/split_table'
+      },
+      promptText: '',
+      promptInputType: null,
+      promptInputText: null
     }
   },
   computed: {
@@ -195,6 +211,9 @@ export default {
   },
   methods: {
     prompt (text) {
+      this.promptText = text
+    },
+    promptInput (text, requiredType) {
       console.log('Prompter:', text)
     },
     validateTime (val) {
@@ -248,65 +267,140 @@ export default {
       }
     },
     updateTables (tables) {
-      this.tables = this.extendTableList(tables)
+      this.tables = tables
+      this.extendTableList()
+      console.log('parent update tables', this.tables)
     },
-    extendTableList (tables) {
-      this.tables = tables.map(table => {
-        table.table_type = (table.table_content > 4) + (table.table_content > 10)
-        return table
-      })
+    extendTableList () {
+      for (var i = 0; i < this.tables.length; i++) {
+        this.tables[i].table_type = (this.tables[i].table_content > 4) + (this.tables[i].table_content > 10)
+      }
     },
     handleOperation (operation, tableId) {
       if (this.operations[operation].includes(tableId)) {
         this.prompt('Duplicated operation!', operation, tableId)
+        // this.prompt = 'Duplicated operation!' + operation + tableId
       } else {
         this.operations[operation].push(tableId)
         console.log('parent operations updated', operation, tableId)
       }
     },
-    // TODO: /api/review_table: request/response
-    reviewTable () {
-      if (this.BookingDate && this.BookingTime && this.BookingGuestNumber) {
-        axios({
-          method: 'get',
-          url: 'http://localhost:8081/api/review_table',
-          data: { book_time: this.BookingDate + ' ' + this.BookingTime }
-        })
-          .then(res => this.updateTables(res.book_status))
-          .catch(err => console.log(err))
+    removeOperations (operation, tableId) {
+      if (this.operations[operation].includes(tableId)) {
+        this.operations[operation] = this.operations[operation].filter(singleOperation => singleOperation !== tableId)
+      } else {
+        this.prompt('remove operation fails because the removed operation ' + tableId + ' is not in operations')
       }
+    },
+    getValidDateTime () {
+      var tmpRequestTime = null
+      if (this.BookingDate && this.BookingTime && this.BookingGuestNumber) {
+        tmpRequestTime = this.BookingDate + ' ' + this.BookingTime
+      } else {
+        tmpRequestTime = null
+      }
+      console.log('valid dt', tmpRequestTime)
+      return tmpRequestTime
+    },
+    handleCancelBooking (val) {
+      this.cancelBookSerial = val
+      this.cancel()
+    },
+    // /api/review_table: request/response
+    reviewTable () {
+      axios({
+        method: 'get',
+        url: 'http://localhost:8081/api/review_table',
+        data: { book_time: this.getValidDateTime() }
+      })
+        .then(res => {
+          this.updateTables(res.data.book_status)
+        })
+        .catch(err => console.log(err))
+      console.log('parent review tables', this.tables)
+    },
+    // TODO: /api/open_table: request/response
+    // TODO: /api/merge_table: request/response
+    // TODO: /api/split_table: request/response
+    handleCommitOperations (operation) {
+      console.log('parent commit operation', operation, this.operations[operation])
+      switch (operation) {
+        case 'book':
+          this.book()
+          break
+        case 'cancel':
+          this.$bvModal.show('cancelBookingPromptInput')
+          break
+        case 'open':
+          this.open()
+          break
+        case 'merge':
+          this.merge()
+          break
+        case 'split':
+          this.split()
+          break
+        default:
+          console.log('commited operation has no handler', operation)
+      }
+    },
+    // TODO: /api/add_book: request/response
+    book () {
+      console.log('Parent request book')
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/add_book',
+        data: {
+          book_time: this.getValidDateTime(),
+          table_id_list: this.operations.book
+        }
+      })
+        .then((res) => {
+          switch (res.data.book_status) {
+            case 0:
+              this.prompt('该时段已预定满')
+              break
+            case 1:
+              this.prompt('预定成功, 预定号' + this.res.data.book_serial)
+              break
+            case 2:
+              this.prompt('预定时间非法')
+              break
+            default:
+              console.log('bug: book opreation receives unexpected book_status in response')
+          }
+        })
+        .catch(err => console.log(err))
+    },
+    // TODO: /api/cancel_book: request/response
+    cancel () {
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/cancel_book',
+        data: { book_serial: this.cancelBookSerial }
+      })
+        .then((res) => {
+          if (res.data.cancel_status === 1) {
+            this.prompt('流水号为' + res.data.book_serial + '的预定取消成功')
+          } else {
+            this.prompt('流水号为' + res.data.book_serial + '的预定取消失败')
+          }
+        })
+        .catch(err => console.log(err))
+    },
+    open () {
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/open_table',
+        data: {
+          table_id_list: null
+        }
+      })
     }
+  },
+  mounted () {
+    this.reviewTable()
+    console.log('parent mounted tables', this.tables)
   }
 }
 </script>
-
-<style>
-/* #input-group-booking-date {
-  position: absolute;
-  left: 85px;
-  top: 99px;
-}
-#input-group-booking-time {
-  position: absolute;
-  left: 85px;
-  top: 193px;
-}
-#input-group-booking-guest-number {
-  position: absolute;
-  left: 669px;
-  top: 99px;
-}
-#checkbox-input-show-booked-tables {
-  position: absolute;
-  left: 855px;
-  top: 210px;
-}
-#checkbox-input-show-unavailable-tables {
-  position: absolute;
-  left: 855px;
-  top: 240px;
-} */
-/* .logo-row {
-  height: 5vh;
-} */
-</style>
