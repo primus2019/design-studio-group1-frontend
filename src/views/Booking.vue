@@ -79,11 +79,35 @@
             :showBookedTables="showBookedTables"
             :showUnavailableTables="showUnavailableTables"
             :tableList="tables"
+            :isCurrent="isCurrent"
             @operation="handleOperation"
           ></TableList>
         </b-col>
       </b-row>
       <b-row class="bg-light pt-3 pb-2" align-h="end">
+        <b-col cols="2">
+          <b-form-input
+            placeholder="Book serial"
+            v-model="bookSerial"
+          ></b-form-input>
+        </b-col>
+        <b-col cols="1">
+          <b-button
+            variant="outline-info"
+            @click="open(true)"
+          >
+            Open
+          </b-button>
+        </b-col>
+        <b-col cols="1">
+          <b-button
+            variant="outline-primary"
+            @click="cancel"
+          >
+            Cancel
+          </b-button>
+        </b-col>
+        <b-col cols="4"/>
         <b-col cols="2">
           <CheckBooking :operations="operations" @remove="removeOperations"/>
         </b-col>
@@ -93,12 +117,6 @@
       </b-row>
     </b-container>
     <Prompter prompterId="bookingPrompter" :promptText="promptText" @reset="promptText=null"/>
-    <PromptInput
-      id="cancelBookingPromptInput"
-      promptInputType="number"
-      promptInputText="Enter book serial"
-      @submit="handleCancelBooking"
-    ></PromptInput>
   </div>
 </template>
 
@@ -112,7 +130,6 @@ import CheckBooking from '../components/CheckBooking'
 import PlaceBookingButton from '../components/PlaceBookingButton'
 import axios from 'axios'
 import Prompter from '../components/Prompter'
-import PromptInput from '../components/PromptInput'
 
 export default {
   name: 'Booking',
@@ -124,8 +141,7 @@ export default {
     TableList,
     CheckBooking,
     PlaceBookingButton,
-    Prompter,
-    PromptInput
+    Prompter
   },
   props: {
     minBookingHour: {
@@ -168,23 +184,15 @@ export default {
       inputGroupBookingGuestNumberReset: false,
       operations: {
         book: [],
-        cancel: [],
         open: [],
         merge: [],
-        split: []
-        // close: [],
-        // shut: []
+        finish: []
       },
-      commitOperationApiDict: {
-        book: '/api/add_book',
-        cancel: '/api/cancel_book',
-        open: '/api/open_table',
-        merge: '/api/merge_table',
-        split: '/api/split_table'
-      },
-      promptText: '',
+      promptText: null,
       promptInputType: null,
-      promptInputText: null
+      promptInputText: null,
+      bookSerial: null,
+      isCurrent: true
     }
   },
   computed: {
@@ -277,12 +285,15 @@ export default {
       }
     },
     handleOperation (operation, tableId) {
-      if (this.operations[operation].includes(tableId)) {
-        this.prompt('Duplicated operation!', operation, tableId)
-        // this.prompt = 'Duplicated operation!' + operation + tableId
+      if (['open', 'book', 'merge'].includes(operation)) {
+        if (this.operations[operation].includes(tableId)) {
+          this.prompt('Duplicated operation!', operation, tableId)
+        } else {
+          this.operations[operation].push(tableId)
+          console.log('parent operations updated', operation, tableId)
+        }
       } else {
-        this.operations[operation].push(tableId)
-        console.log('parent operations updated', operation, tableId)
+        this.operations[operation] = [tableId]
       }
     },
     removeOperations (operation, tableId) {
@@ -296,40 +307,63 @@ export default {
       var tmpRequestTime = null
       if (this.BookingDate && this.BookingTime && this.BookingGuestNumber) {
         tmpRequestTime = this.BookingDate + ' ' + this.BookingTime
+        this.isCurrent = false
       } else {
         tmpRequestTime = null
+        this.isCurrent = true
       }
       console.log('valid dt', tmpRequestTime)
       return tmpRequestTime
     },
-    handleCancelBooking (val) {
-      this.cancelBookSerial = val
-      this.cancel()
+    resetOperations () {
+      this.operations = {
+        book: [],
+        open: [],
+        merge: [],
+        finish: []
+      }
+    },
+    firstBusyTable (tableIdList) {
+      for (var i = 0; i < tableIdList.length; i++) {
+        for (var j = 0; j < this.tables.length; j++) {
+          // if table_id is the same
+          if (this.tables[j].table_id === tableIdList[i]) {
+            // if table is busy
+            if (this.tables[j].book_status === 0) {
+              return tableIdList[i]
+            } else {
+              break
+            }
+          }
+        }
+      }
+      return -1
     },
     // /api/review_table: request/response
     reviewTable () {
+      console.log('parent review_table request', {
+        method: 'get',
+        url: 'http://localhost:8081/api/review_table',
+        params: { book_time: this.getValidDateTime() }
+      })
+      this.resetOperations()
       axios({
         method: 'get',
         url: 'http://localhost:8081/api/review_table',
-        data: { book_time: this.getValidDateTime() }
+        params: { book_time: this.getValidDateTime() }
       })
-        .then(res => {
+        .then((res) => {
+          console.log('parent review_table response.data', res.data)
           this.updateTables(res.data.book_status)
         })
-        .catch(err => console.log(err))
+        .catch((err) => console.log(err))
       console.log('parent review tables', this.tables)
     },
-    // TODO: /api/open_table: request/response
-    // TODO: /api/merge_table: request/response
-    // TODO: /api/split_table: request/response
     handleCommitOperations (operation) {
       console.log('parent commit operation', operation, this.operations[operation])
       switch (operation) {
         case 'book':
           this.book()
-          break
-        case 'cancel':
-          this.$bvModal.show('cancelBookingPromptInput')
           break
         case 'open':
           this.open()
@@ -340,13 +374,25 @@ export default {
         case 'split':
           this.split()
           break
+        case 'cancel':
+          this.cancel()
+          break
+        case 'finish':
+          this.finish()
+          break
         default:
           console.log('commited operation has no handler', operation)
       }
+      setTimeout(() => {
+        this.reviewTable()
+      }, 500)
     },
-    // TODO: /api/add_book: request/response
+    // /api/add_book: request/response
     book () {
-      console.log('Parent request book')
+      console.log('Parent book request', {
+        book_time: this.getValidDateTime(),
+        table_id_list: this.operations.book
+      })
       axios({
         method: 'post',
         url: 'http://localhost:8081/api/add_book',
@@ -356,12 +402,13 @@ export default {
         }
       })
         .then((res) => {
+          console.log('parent book response', res)
           switch (res.data.book_status) {
             case 0:
               this.prompt('该时段已预定满')
               break
             case 1:
-              this.prompt('预定成功, 预定号' + this.res.data.book_serial)
+              this.prompt('预定成功, 预定号' + res.data.book_serial)
               break
             case 2:
               this.prompt('预定时间非法')
@@ -371,13 +418,14 @@ export default {
           }
         })
         .catch(err => console.log(err))
+      this.operations.book = []
     },
-    // TODO: /api/cancel_book: request/response
+    // /api/cancel_book: request/response
     cancel () {
       axios({
         method: 'post',
         url: 'http://localhost:8081/api/cancel_book',
-        data: { book_serial: this.cancelBookSerial }
+        data: { book_serial: this.bookSerial }
       })
         .then((res) => {
           if (res.data.cancel_status === 1) {
@@ -387,15 +435,119 @@ export default {
           }
         })
         .catch(err => console.log(err))
+      this.bookSerial = null
     },
-    open () {
+    // TODO: /api/open_table: request/response
+    open (book = false) {
+      console.log('parent open request', {
+        method: 'post',
+        url: 'http://localhost:8081/api/open_table',
+        data: {
+          table_id_list: book ? null : this.operations.open,
+          book_serial: book ? this.bookSerial : null
+        }
+      })
       axios({
         method: 'post',
         url: 'http://localhost:8081/api/open_table',
         data: {
-          table_id_list: null
+          table_id_list: book ? null : this.operations.open,
+          book_serial: book ? this.bookSerial : null
         }
       })
+        .then((res) => {
+          if (book) {
+            switch (res.data.open_status) {
+              case 0:
+                this.prompt('预定号无效')
+                break
+              case 1:
+                this.prompt('预定号过期')
+                break
+              case 2:
+                this.prompt('预定号没到')
+                break
+              case 3:
+                this.prompt('预定桌号被现场占用')
+                break
+              case 4:
+                this.prompt('成功')
+                break
+              default:
+                this.prompt('bug: unexpected open_status in /api/open_table:', res.data.open_status)
+            }
+          } else {
+            switch (res.data.open_status) {
+              case 0:
+                this.prompt('开台失败')
+                break
+              case 1:
+                this.prompt('开台成功')
+                break
+              default:
+                this.prompt('bug: unexpected open_status in /api/open_table:', res.data.open_status)
+            }
+          }
+        })
+      if (this.isCurrent) {
+        this.operations.open = []
+      } else {
+        this.bookSerial = null
+      }
+    },
+    // TODO: /api/merge_table: request/response
+    merge () {
+      const tmpMainTable = this.firstBusyTable(this.operations.merge)
+      if (tmpMainTable === -1) {
+        this.prompt('并台队列无合法主桌')
+        return
+      }
+      console.log('parent merge request', {
+        method: 'post',
+        url: 'http://localhost:8081/api/merge_table',
+        data: {
+          main_table_id: tmpMainTable,
+          table_id_list: this.operations.merge
+        }
+      })
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/merge_table',
+        data: {
+          main_table_id: tmpMainTable,
+          table_id_list: this.operations.merge
+        }
+      })
+        .then((res) => {
+          console.log('parent merge response.data', res.data)
+          if (res.data.merge_status === 0) {
+            this.prompt('并台成功, 主桌号:', res.data.main_table_id)
+          } else if (res.data.merge_status === 1) {
+            this.prompt('并台失败')
+          } else {
+            this.prompt('bug: unexpected merge_status in /api/merge_table: response')
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    // TODO: /api/finish_table: request/response
+    finish () {
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/finish_table',
+        data: { table_id: this.operations.finish[0] }
+      })
+        .then((res) => {
+          console.log('parent finish response.data', res.data)
+          if (res.data.finish_status === 0) {
+            this.prompt('桌号' + res.data.table_id + '撤台成功')
+          } else if (res.data.finish_status === 1) {
+            this.prompt('桌号' + res.data.table_id + '撤台失败')
+          } else {
+            this.prompt('bug: unexpected finish_status in /api/finish_table: response')
+          }
+        })
+        .catch((err) => console.log(err))
     }
   },
   mounted () {

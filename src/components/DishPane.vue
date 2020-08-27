@@ -37,7 +37,26 @@
               <h4>单价 ￥{{ dish.price }}</h4>
             </b-row>
             <b-row align-h="end" align-v="center" style="height:100%">
-              <b-col cols="7"/>
+              <b-col cols="7">
+                <b-row align-h="start" align-v="center">
+                  <b-button-group
+                    class="h5 pl-4 pr-4 ml-5 mb-5"
+                  >
+                    <b-button
+                      v-if="dish.orderCount !== 0 && orderSet"
+                      @click="$emit('remove', dish.dish_id)"
+                    >
+                      remove
+                    </b-button>
+                    <b-button
+                      v-if="dish.orderCount !== 0 && orderSet"
+                      @click="$emit('nudge', dish.dish_id)"
+                    >
+                      nudge
+                    </b-button>
+                  </b-button-group>
+                </b-row>
+              </b-col>
               <b-col cols="2">
                 <h5>￥{{ dish.orderCount * dish.price }}</h5>
               </b-col>
@@ -47,7 +66,7 @@
                     variant="outline-primary"
                     class="h5 pl-4 pr-4"
                     @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                    :disabled="dish.orderCount === 0 || !dish.selectable"
+                    :disabled="dish.orderCount === 0 || !dish.selectable || orderSet"
                   >
                     <b-icon icon="dash"/>
                   </b-button>
@@ -64,7 +83,7 @@
                     variant="primary"
                     class="h5 pl-4 pr-4"
                     @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
-                    :disabled="!dish.selectable"
+                    :disabled="!dish.selectable || orderSet"
                   >
                     <b-icon icon="plus"/>
                   </b-button>
@@ -82,6 +101,9 @@
 export default {
   name: 'DishPane',
   props: {
+    orderSet: {
+      type: Boolean
+    },
     dishes: {
       type: Array,
       default: () => [

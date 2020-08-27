@@ -11,16 +11,35 @@
             <MenuHeading :dishes="dishes"/>
           </b-sidebar>
         </b-col>
-        <b-col cols="2"/>
-        <b-col cols="8">
+        <b-col cols="7">
           <Search :dishes="dishes"/>
+        </b-col>
+        <b-col cols="3">
+          <b-input-group>
+            <b-form-input
+              :disabled="orderTableIdDisable"
+              placeholder="Enter table id"
+              type="number"
+              v-model="tableId"
+            ></b-form-input>
+            <b-input-group-append>
+              <b-button
+                @click="orderTableIdDisable = true;"
+              >
+                confirm
+              </b-button>
+            </b-input-group-append>
+          </b-input-group>
         </b-col>
       </b-row>
       <b-row align-h="center">
         <b-col>
           <DishPane
             :dishes="dishes"
+            :orderSet="orderSet"
             @change="changeOrderCount"
+            @remove="removeOrder"
+            @nudge="nudge"
           ></DishPane>
         </b-col>
       </b-row>
@@ -38,17 +57,35 @@
             <h2>￥{{ this.orderPriceSum() }}</h2>
             <OrderDetail
               orderDetailModalId="orderDetailModalId"
+              :orderSet="orderSet"
               :dishes="dishes"
               @change="changeOrderCount"
             ></OrderDetail>
           </b-row>
         </b-col>
-        <b-col cols="7"/>
+        <b-col cols="5"/>
         <b-col cols="2">
-          <PlaceOrderButton/>
+          <b-button
+            pill
+            v-if="!orderSet"
+            v-b-modal.billModalId
+          >Pay orders
+          </b-button>
+        </b-col>
+        <b-col cols="2">
+          <PlaceOrderButton
+            :orderSet="orderSet"
+            @addOrder="addOrder"
+          ></PlaceOrderButton>
         </b-col>
       </b-row>
     </b-container>
+    <Prompter prompterId="orderPrompter" :promptText="promptText" @reset="promptText=null"/>
+    <Bill
+      billModalId="billModalId"
+      :dishes="dishes"
+      @pay="pay"
+    ></Bill>
   </div>
 </template>
 
@@ -59,6 +96,9 @@ import Search from '../components/Search'
 import MenuHeading from '../components/MenuHeading'
 import DishPane from '../components/DishPane'
 import PlaceOrderButton from '../components/PlaceOrderButton'
+import axios from 'axios'
+import Prompter from '../components/Prompter'
+import Bill from '../components/Bill'
 
 export default {
   name: 'Order',
@@ -68,42 +108,27 @@ export default {
     Search,
     MenuHeading,
     DishPane,
-    PlaceOrderButton
+    PlaceOrderButton,
+    Prompter,
+    Bill
   },
   data () {
     return {
-      orderLogoDir: 'takeout.png',
+      orderLogoDir: 'order.png',
       orderFluid: 'xl',
-      dishes: [
-        { dish_id: 0, name: '红烧肉1', price: 10.00, type: 0, orderCount: 0, typeName: '肉类' },
-        { dish_id: 1, name: '红烧肉1', price: 10.00, type: 0, orderCount: 0, typeName: '肉类' },
-        { dish_id: 2, name: '红烧肉1', price: 10.00, type: 0, orderCount: 0, typeName: '肉类' },
-        { dish_id: 3, name: '红烧肉1', price: 10.00, type: 0, orderCount: 0, typeName: '肉类' },
-        { dish_id: 4, name: '红烧肉1', price: 10.00, type: 0, orderCount: 0, typeName: '肉类' },
-        { dish_id: 5, name: '红烧肉2', price: 11.00, type: 1, orderCount: 0, typeName: '肉类' },
-        { dish_id: 6, name: '红烧肉2', price: 11.00, type: 1, orderCount: 0, typeName: '肉类' },
-        { dish_id: 7, name: '红烧肉2', price: 11.00, type: 1, orderCount: 0, typeName: '肉类' },
-        { dish_id: 8, name: '红烧肉2', price: 11.00, type: 1, orderCount: 0, typeName: '肉类' },
-        { dish_id: 9, name: '红烧肉2', price: 11.00, type: 1, orderCount: 0, typeName: '肉类' },
-        { dish_id: 10, name: '红烧肉2', price: 11.00, type: 2, orderCount: 0, typeName: '肉类' },
-        { dish_id: 11, name: '红烧肉3', price: 12.00, type: 2, orderCount: 0, typeName: '肉类' },
-        { dish_id: 12, name: '红烧肉3', price: 12.00, type: 2, orderCount: 0, typeName: '肉类' },
-        { dish_id: 13, name: '红烧肉3', price: 12.00, type: 3, orderCount: 0, typeName: '肉类' },
-        { dish_id: 14, name: '红烧肉3', price: 12.00, type: 3, orderCount: 0, typeName: '肉类' },
-        { dish_id: 15, name: '红烧肉4', price: 13.00, type: 4, orderCount: 0, typeName: '肉类' },
-        { dish_id: 16, name: '红烧肉4', price: 13.00, type: 4, orderCount: 0, typeName: '肉类' },
-        { dish_id: 17, name: '红烧肉4', price: 13.00, type: 4, orderCount: 0, typeName: '肉类' },
-        { dish_id: 18, name: '红烧肉5', price: 14.00, type: 4, orderCount: 0, typeName: '肉类' },
-        { dish_id: 19, name: '红烧肉5', price: 14.00, type: 4, orderCount: 0, typeName: '肉类' },
-        { dish_id: 20, name: '红烧肉5', price: 14.00, type: 5, orderCount: 0, typeName: '肉类' },
-        { dish_id: 21, name: '红烧肉5', price: 14.00, type: 5, orderCount: 0, typeName: '肉类' },
-        { dish_id: 22, name: '红烧肉5', price: 14.00, type: 5, orderCount: 0, typeName: '肉类' },
-        { dish_id: 23, name: '红烧肉5', price: 14.00, type: 5, orderCount: 0, typeName: '肉类' },
-        { dish_id: 24, name: '红烧肉5', price: 14.00, type: 6, orderCount: 0, typeName: '肉类' }
-      ]
+      dishes: [],
+      takeoutId: -1,
+      promptText: null,
+      tableId: null,
+      orderTableIdDisable: false,
+      orderSet: false,
+      paymentMethod: null
     }
   },
   methods: {
+    prompt (text) {
+      this.promptText = text
+    },
     orderCountSum () {
       var tmpSum = 0
       for (var i = 0; i < this.dishes.length; i++) {
@@ -128,11 +153,180 @@ export default {
         this.dishes[i] = tmpDish
       }
     },
+    // TODO: /api/dish_residue: request/response
     changeOrderCount (dishId, newOrderCount) {
       this.dishes.forEach((dish) => {
         if (dish.dish_id === dishId) {
           dish.orderCount = newOrderCount
         }
+      })
+      const newOrder = this.dishes
+        .filter((dish) => dish.orderCount > 0)
+        .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
+      console.log('parent dish_residue request', {
+        method: 'get',
+        url: 'http://localhost:8081/api/dish_residue',
+        params: { dishes: newOrder }
+      })
+      axios({
+        method: 'get',
+        url: 'http://localhost:8081/api/dish_residue',
+        params: { dishes: newOrder }
+      })
+        .then((res) => {
+          console.log('parent dish_residue response.data', res.data)
+          this.handleSoldout(res.data.dishes)
+        })
+        .catch((err) => console.log(err))
+    },
+    handleSoldout (dishes) {
+      for (const [dish, index] in dishes) {
+        var soldOutList = []
+        if (dish.sold_out === 1) {
+          this.dishes[index].orderCount = 0
+          this.dishes[index].selectable = false
+          this.soldOutList.push(dish.name)
+        }
+        if (soldOutList.length !== 0) {
+          this.prompt(soldOutList.join(','), 'has sold out!')
+        }
+      }
+    },
+    // /api/add_order: request/response (order only for now)
+    // it should use the table related api
+    addOrder () {
+      if (!this.tableId) {
+        this.prompt('请输入桌号')
+        return
+      }
+      const newOrder = this.dishes
+        .filter(dish => dish.orderCount > 0)
+        .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
+      console.log('parent add_order request', {
+        method: 'post',
+        url: 'http://localhost:8081/api/add_order',
+        data: { table_id: this.tableId, dishes: newOrder }
+      })
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/add_order',
+        data: { table_id: this.tableId, dishes: newOrder }
+      })
+        .then((res) => {
+          console.log('parent add_order response.data', res.data)
+          if (res.data.success === 1) {
+            this.prompt('Your orders are all set!')
+            this.orderSet = true
+            setTimeout(() => {
+              this.$bvModal.show('billModalId')
+            }, 3000)
+          } else {
+            var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
+            this.prompt(soldOutList.join(','), 'has been sold out; your order fails!')
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    // TODO: /api/remove_dish: request/response
+    removeOrder (dishId) {
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/remove_order',
+        data: {
+          table_id: this.tableId,
+          dishes: {
+            dish_id: dishId,
+            count: 1
+          }
+        }
+      })
+        .then((res) => {
+          if (res.data.success === 1) {
+            this.prompt('菜品删除成功')
+            this.dishes[dishId].orderCount -= 1
+          } else if (res.data.success === 0) {
+            this.prompt('菜品删除失败')
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    // TODO: /api/nudge: request
+    nudge (dishId) {
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/nudge',
+        data: { table_id: this.tableId }
+      })
+        .catch((err) => console.log(err))
+    },
+    convertStaticDishes (dishes) {
+      this.dishes = []
+      var allTypes = []
+      dishes.forEach((dish) => {
+        if (!allTypes.includes(dish.type)) {
+          allTypes.push(dish.type)
+        }
+        // the index of dish type in `allTypes` is the no of dish type
+        var tmpDish = {}
+        tmpDish.dish_id = dish.id
+        tmpDish.name = dish.name
+        tmpDish.price = dish.price
+        tmpDish.typeName = dish.type
+        tmpDish.orderCount = 0
+        tmpDish.type = allTypes.indexOf(dish.type)
+        tmpDish.picture = dish.picture
+        tmpDish.selectable = true
+        this.dishes.push(tmpDish)
+      })
+    },
+    totalPrice () {
+      var tmpSum = 0
+      for (var i = 0; i < this.dishes.length; i++) {
+        tmpSum += this.dishes[i].price * this.dishes[i].orderCount
+      }
+      return tmpSum
+    },
+    // TODO: /g3/confirm_payment: request/response
+    //
+    //
+    //
+    //
+    pay (method) {
+      this.paymentMethod = method
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/pay_table',
+        data: { table_id: this.tableId }
+      })
+        .catch((err) => console.log(err))
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/g3/discount_payment',
+        data: {
+          total_price: this.totalPrice(),
+          telephone: this.telephone,
+          table_id: this.tableId
+        }
+          .then((res) => {
+            this.discountPrice = res.data.discount_price
+          })
+          .catch((err) => console.log(err))
+      })
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/g3/confirm_payment',
+        data: {
+          payment_method: this.paymentMethod
+        }
+          .then((res) => {
+            if (res.data.payment_status === 0) {
+              this.prompt('Your purchase is all set.')
+            } else if (res.data.payment_status === 1) {
+              this.prompt('Your purchase fails; ask the servants for help.')
+            } else {
+              this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
+            }
+          })
       })
     }
   },
@@ -144,6 +338,15 @@ export default {
         return false
       }
     }
+  },
+  mounted () {
+    const path = 'http://localhost:8081/api/dish'
+    axios({
+      method: 'get',
+      url: path
+    })
+      .then(res => this.convertStaticDishes(res.data.dishes))
+      .catch(err => console.log(err))
   }
 }
 </script>

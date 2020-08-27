@@ -24,7 +24,7 @@
                   variant="outline-primary"
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                  :disabled="dish.orderCount === 0"
+                  :disabled="dish.orderCount === 0 || orderSet"
                 >
                   <b-icon icon="dash"/>
                 </b-button>
@@ -41,6 +41,7 @@
                   variant="primary"
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
+                  :disabled="orderSet"
                 >
                   <b-icon icon="plus"/>
                 </b-button>
@@ -74,6 +75,9 @@ export default {
     orderDetailModalId: {
       type: String,
       default: 'orderDetailModalId'
+    },
+    orderSet: {
+      type: Boolean
     }
   },
   data () {

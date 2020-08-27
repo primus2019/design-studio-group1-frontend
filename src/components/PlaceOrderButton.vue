@@ -7,7 +7,7 @@
       class="h2"
       @click="addOrder"
     >
-      Place Orders
+      {{ orderSet ? 'Change Orders' : 'Place Orders'}}
     </b-button>
   </div>
 </template>
@@ -15,6 +15,11 @@
 <script>
 export default {
   name: 'PlaceOrderButton',
+  props: {
+    orderSet: {
+      type: Boolean
+    }
+  },
   methods: {
     addOrder () {
       this.$emit('addOrder')

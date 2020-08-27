@@ -26,10 +26,10 @@ export default {
     return {
       operationList: [
         'book',
-        'cancel',
         'open',
         'merge',
-        'split'
+        'split',
+        'finish'
       ]
     }
   },

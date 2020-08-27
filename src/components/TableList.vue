@@ -27,17 +27,9 @@
             <b-button
               size="sm"
               class="table-list-operation-button"
-              variant="outline-success"
-              v-if="singleTable.item.book_status === 0"
-              @click="updateOperation('cancel', singleTable.item.table_id)"
-            >
-              Cancel
-            </b-button>
-            <b-button
-              size="sm"
-              class="table-list-operation-button"
               variant="outline-info"
               @click="updateOperation('merge', singleTable.item.table_id)"
+              v-if="isCurrent"
             >
               Merge
             </b-button>
@@ -45,15 +37,16 @@
               size="sm"
               class="table-list-operation-button"
               variant="outline-info"
-              @click="updateOperation('split', singleTable.item.table_id)"
+              @click="updateOperation('finish', singleTable.item.table_id)"
+              v-if="isCurrent && singleTable.item.book_status === 0"
             >
-              Split
+              Finish
             </b-button>
             <b-button
               size="sm"
               class="table-list-operation-button"
               variant="outline-primary"
-              v-if="singleTable.item.book_status === 1"
+              v-if="singleTable.item.book_status === 1 && isCurrent"
               @click="updateOperation('open', singleTable.item.table_id)"
             >
               Open
@@ -62,8 +55,8 @@
         </b-row>
       </template>
       <template v-slot:cell(book_status)="singleTable">
-        <!-- {{ bookStatusDict[singleTable.item.book_status] }} -->
-        {{ singleTable.item.book_status }}
+        {{ bookStatusDict[singleTable.item.book_status] }}
+        <!-- {{ singleTable.item.book_status }} -->
       </template>
     </b-table>
   </div>
@@ -83,6 +76,10 @@ export default {
     showUnavailableTables: {
       type: Boolean,
       default: false
+    },
+    isCurrent: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
