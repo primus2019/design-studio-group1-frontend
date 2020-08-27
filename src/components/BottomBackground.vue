@@ -9,3 +9,9 @@ export default {
   name: 'BottomBackground'
 }
 </script>
+
+<style>
+.div {
+  width: 100%;
+}
+</style>
