@@ -43,13 +43,13 @@
                     class="h5 pl-4 pr-4 ml-5 mb-5"
                   >
                     <b-button
-                      v-if="dish.orderCount !== 0 && orderSet"
+                      v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
                       @click="$emit('remove', dish.dish_id)"
                     >
                       remove
                     </b-button>
                     <b-button
-                      v-if="dish.orderCount !== 0 && orderSet"
+                      v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
                       @click="$emit('nudge', dish.dish_id)"
                     >
                       nudge
@@ -113,6 +113,10 @@ export default {
         { dish_id: 3, name: '红烧肉4', price: 13.00, type: 3, orderCount: 1, typeName: '肉类' },
         { dish_id: 4, name: '红烧肉5', price: 14.00, type: 4, orderCount: 1, typeName: '肉类' }
       ]
+    },
+    isTakeout: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

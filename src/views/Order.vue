@@ -67,7 +67,7 @@
         <b-col cols="2">
           <b-button
             pill
-            v-if="!orderSet"
+            v-if="orderSet"
             v-b-modal.billModalId
           >Pay orders
           </b-button>
@@ -304,27 +304,27 @@ export default {
           telephone: this.telephone,
           table_id: this.tableId
         }
-          .then((res) => {
-            this.discountPrice = res.data.discount_price
-          })
-          .catch((err) => console.log(err))
       })
+        .then((res) => {
+          this.discountPrice = res.data.discount_price
+        })
+        .catch((err) => console.log(err))
       axios({
         method: 'post',
         url: 'http://localhost:8081/g3/confirm_payment',
         data: {
           payment_method: this.paymentMethod
         }
-          .then((res) => {
-            if (res.data.payment_status === 0) {
-              this.prompt('Your purchase is all set.')
-            } else if (res.data.payment_status === 1) {
-              this.prompt('Your purchase fails; ask the servants for help.')
-            } else {
-              this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
-            }
-          })
       })
+        .then((res) => {
+          if (res.data.payment_status === 0) {
+            this.prompt('Your purchase is all set.')
+          } else if (res.data.payment_status === 1) {
+            this.prompt('Your purchase fails; ask the servants for help.')
+          } else {
+            this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
+          }
+        })
     }
   },
   computed: {

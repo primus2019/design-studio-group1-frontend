@@ -15,21 +15,11 @@
           <Search :dishes="dishes"/>
         </b-col>
         <b-col cols="3">
-          <b-input-group>
-            <b-form-input
-              :disabled="orderTableIdDisable"
-              placeholder="Enter table id"
-              type="number"
-              v-model="tableId"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                @click="orderTableIdDisable = true;"
-              >
-                confirm
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
+          <TakeoutInfoForm
+            id="takeoutInfoForm"
+            :disable="orderSet"
+            @submit="handleTakeoutInfo"
+          ></TakeoutInfoForm>
         </b-col>
       </b-row>
       <b-row align-h="center">
@@ -37,6 +27,7 @@
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
+            :isTakeout="true"
             @change="changeOrderCount"
             @remove="removeOrder"
             @nudge="nudge"
@@ -67,7 +58,7 @@
         <b-col cols="2">
           <b-button
             pill
-            v-if="!orderSet"
+            v-if="orderSet"
             v-b-modal.billModalId
           >Pay orders
           </b-button>
@@ -75,7 +66,7 @@
         <b-col cols="2">
           <PlaceOrderButton
             :orderSet="orderSet"
-            @addOrder="addOrder"
+            @addOrder="addTakeout"
           ></PlaceOrderButton>
         </b-col>
       </b-row>
@@ -99,6 +90,7 @@ import PlaceOrderButton from '../components/PlaceOrderButton'
 import axios from 'axios'
 import Prompter from '../components/Prompter'
 import Bill from '../components/Bill'
+import TakeoutInfoForm from '../components/TakeoutInfoForm'
 
 export default {
   name: 'Order',
@@ -110,19 +102,23 @@ export default {
     DishPane,
     PlaceOrderButton,
     Prompter,
-    Bill
+    Bill,
+    TakeoutInfoForm
   },
   data () {
     return {
       orderLogoDir: 'order.png',
       orderFluid: 'xl',
       dishes: [],
-      takeoutId: -1,
+      takeoutId: null,
       promptText: null,
       tableId: null,
       orderTableIdDisable: false,
       orderSet: false,
-      paymentMethod: null
+      paymentMethod: null,
+      takeoutName: null,
+      takeoutPhone: null,
+      takeoutAddress: null
     }
   },
   methods: {
@@ -152,6 +148,12 @@ export default {
         tmpDish.price = 1
         this.dishes[i] = tmpDish
       }
+    },
+    handleTakeoutInfo (dict) {
+      this.takeoutName = dict.name
+      this.takeoutPhone = dict.phone
+      this.takeoutAddress = dict.address
+      console.log('parent handle tabkeout info', dict)
     },
     // TODO: /api/dish_residue: request/response
     changeOrderCount (dishId, newOrderCount) {
@@ -192,31 +194,49 @@ export default {
         }
       }
     },
-    // /api/add_order: request/response (order only for now)
-    // it should use the table related api
-    addOrder () {
-      if (!this.tableId) {
-        this.prompt('请输入桌号')
+    // /api/add_takeout: request/response
+    addTakeout () {
+      if (!this.takeoutName) {
+        this.prompt('请输入姓名')
+        return
+      }
+      if (!this.takeoutPhone) {
+        this.prompt('请输入手机号')
+        return
+      }
+      if (!this.takeoutAddress) {
+        this.prompt('请输入地址')
         return
       }
       const newOrder = this.dishes
         .filter(dish => dish.orderCount > 0)
         .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
-      console.log('parent add_order request', {
+      console.log('parent add_takeout request', {
         method: 'post',
-        url: 'http://localhost:8081/api/add_order',
-        data: { table_id: this.tableId, dishes: newOrder }
+        url: 'http://localhost:8081/api/add_takeout',
+        data: {
+          dishes: newOrder,
+          name: this.takeoutName,
+          phone: this.takeoutPhone,
+          address: this.takeoutAddress
+        }
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/add_order',
-        data: { table_id: this.tableId, dishes: newOrder }
+        url: 'http://localhost:8081/api/add_takeout',
+        data: {
+          dishes: newOrder,
+          name: this.takeoutName,
+          phone: this.takeoutPhone,
+          address: this.takeoutAddress
+        }
       })
         .then((res) => {
-          console.log('parent add_order response.data', res.data)
+          console.log('parent add_takeout response.data', res.data)
           if (res.data.success === 1) {
-            this.prompt('Your orders are all set!')
+            this.prompt('Your takeouts are all set!')
             this.orderSet = true
+            this.takeoutId = res.data.takeout_id
             setTimeout(() => {
               this.$bvModal.show('billModalId')
             }, 3000)
@@ -307,27 +327,27 @@ export default {
           telephone: this.telephone,
           table_id: this.tableId
         }
-          .then((res) => {
-            this.discountPrice = res.data.discount_price
-          })
-          .catch((err) => console.log(err))
       })
+        .then((res) => {
+          this.discountPrice = res.data.discount_price
+        })
+        .catch((err) => console.log(err))
       axios({
         method: 'post',
         url: 'http://localhost:8081/g3/confirm_payment',
         data: {
           payment_method: this.paymentMethod
         }
-          .then((res) => {
-            if (res.data.payment_status === 0) {
-              this.prompt('Your purchase is all set.')
-            } else if (res.data.payment_status === 1) {
-              this.prompt('Your purchase fails; ask the servants for help.')
-            } else {
-              this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
-            }
-          })
       })
+        .then((res) => {
+          if (res.data.payment_status === 0) {
+            this.prompt('Your purchase is all set.')
+          } else if (res.data.payment_status === 1) {
+            this.prompt('Your purchase fails; ask the servants for help.')
+          } else {
+            this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
+          }
+        })
     }
   },
   computed: {
