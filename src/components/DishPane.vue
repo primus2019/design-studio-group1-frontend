@@ -8,90 +8,90 @@
         :id="'dish-card-'+dish.type"
         deck
       > -->
-        <b-card
-          :id="'dish-card-'+dish.type"
-          class="dish-card"
-          no-body
-          @mouseover="setOverlayOn(index)"
-          @mouseout="setOverlayOn(null)"
+        <div
+          v-b-hover="(isHover) => overlayOn = isHover ? index : null"
         >
-          <b-overlay
-            :ref="'dishCardOverlay'+index"
-            :show="overlayOn !== index"
-            style="position:absolute;height:100%"
-            variant="white"
-            :opacity="0.4"
+          <b-card
+            :id="'dish-card-'+dish.type"
+            class="dish-card"
+            no-body
           >
-            <template v-slot:overlay>
-              <div/>
-            </template>
-            <b-img
-              :src="'data:image/png;base64,'+dish.picture"
-              style="height:100%"
-              :alt="dish.name"
-            ></b-img>
-          </b-overlay>
-          <b-container style="z-index:20;position:absolute;height:100%">
-            <b-row align-h="start" align-v="end" class="mt-3 mb-5 ml-3">
-              <h1 class="mr-5">{{ dish.name }}</h1>
-              <h4>单价 ￥{{ dish.price }}</h4>
-            </b-row>
-            <b-row align-h="end" align-v="center" style="height:100%">
-              <b-col cols="7">
-                <b-row align-h="start" align-v="center">
-                  <b-button-group
-                    class="h5 pl-4 pr-4 ml-5 mb-5"
-                  >
-                    <b-button
-                      v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
-                      @click="$emit('remove', dish.dish_id)"
+            <b-overlay
+              :ref="'dishCardOverlay'+index"
+              :show="overlayOn !== index"
+              style="position:absolute;height:100%"
+              variant="white"
+              :opacity="0.4"
+            >
+              <template v-slot:overlay>
+                <div/>
+              </template>
+              <b-img
+                :src="'data:image/png;base64,'+dish.picture"
+                style="height:100%"
+                :alt="dish.name"
+              ></b-img>
+            </b-overlay>
+            <b-container style="z-index:20;position:absolute;height:100%">
+              <b-row align-h="between" align-v="end" class="mt-3 ml-3">
+                <b-col cols="3">
+                  <b-row align-h="start">
+                    <h1>{{ dish.name }}</h1>
+                  </b-row>
+                </b-col>
+                <b-col cols="2">
+                  <h4>单价 ￥{{ dish.price }}</h4>
+                </b-col>
+              </b-row>
+              <b-row align-h="end" align-v="center" style="height:100%">
+                <b-col cols="7">
+                  <b-row align-h="start" align-v="center">
+                    <b-button-group
+                      class="h5 pl-4 pr-4 ml-5 mb-5"
                     >
-                      remove
-                    </b-button>
+                      <b-button
+                        v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
+                        @click="$emit('remove', dish.dish_id)"
+                      >
+                        remove
+                      </b-button>
+                      <b-button
+                        v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
+                        @click="$emit('nudge', dish.dish_id)"
+                      >
+                        nudge
+                      </b-button>
+                    </b-button-group>
+                  </b-row>
+                </b-col>
+                <b-col cols="1">
+                  <!-- <h5>￥{{ dish.orderCount * dish.price }}0000</h5> -->
+                </b-col>
+                <b-col cols="4">
+                  <b-row align-h="end" align-v="center">
                     <b-button
-                      v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
-                      @click="$emit('nudge', dish.dish_id)"
+                      variant="outline-primary"
+                      class="h5 pl-4 pr-4"
+                      @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
+                      :disabled="dish.orderCount === 0 || !dish.selectable || orderSet"
                     >
-                      nudge
+                      <b-icon icon="dash"/>
                     </b-button>
-                  </b-button-group>
-                </b-row>
-              </b-col>
-              <b-col cols="2">
-                <h5>￥{{ dish.orderCount * dish.price }}</h5>
-              </b-col>
-              <b-col cols="1">
-                <b-row align-h="center" align-v="center">
-                  <b-button
-                    variant="outline-primary"
-                    class="h5 pl-4 pr-4"
-                    @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                    :disabled="dish.orderCount === 0 || !dish.selectable || orderSet"
-                  >
-                    <b-icon icon="dash"/>
-                  </b-button>
-                </b-row>
-              </b-col>
-              <b-col cols="1">
-                <b-row align-h="center" align-v="center">
-                  <h5>{{ dish.orderCount }}</h5>
-                </b-row>
-              </b-col>
-              <b-col cols="1">
-                <b-row align-h="center" align-v="center">
-                  <b-button
-                    variant="primary"
-                    class="h5 pl-4 pr-4"
-                    @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
-                    :disabled="!dish.selectable || orderSet"
-                  >
-                    <b-icon icon="plus"/>
-                  </b-button>
-                </b-row>
-              </b-col>
-            </b-row>
-          </b-container>
-        </b-card>
+                    <h5 class="h5 ml-4 mr-4">{{ dish.orderCount }}</h5>
+                    <b-button
+                      variant="primary"
+                      class="h5 pl-4 pr-4"
+                      @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
+                      :disabled="!dish.selectable || orderSet"
+                    >
+                      <b-icon icon="plus"/>
+                    </b-button>
+                  </b-row>
+                </b-col>
+              </b-row>
+            </b-container>
+          </b-card>
+        </div>
       <!-- </b-card-group> -->
     </div>
   </div>
@@ -134,9 +134,6 @@ export default {
       // })
       // console.log('DishPane: changeOrderCount', dishId, newOrderCount)
       this.$emit('change', dishId, newOrderCount)
-    },
-    setOverlayOn (index) {
-      this.overlayOn = index
     }
   }
 }

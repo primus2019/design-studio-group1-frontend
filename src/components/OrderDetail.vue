@@ -2,11 +2,12 @@
   <b-modal
     :id="orderDetailModalId"
     centered
-    hide-header
     scrollable
     ok-only
     button-size="lg"
+    title="Your orders"
   >
+    <div v-if="emptyDish">No order</div>
     <b-list-group v-for="dish in dishes" :key="dish.dish_id">
       <b-list-group-item  v-if="dish.orderCount !== 0">
         <b-container>
@@ -96,6 +97,9 @@ export default {
     }
   },
   computed: {
+    emptyDish () {
+      return this.dishes.filter(dish => dish.orderCount > 0).length === 0
+    }
   }
 }
 </script>
