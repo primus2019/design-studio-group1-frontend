@@ -4,7 +4,7 @@
       <b-form-input list="orderSearchList" v-model="orderSearchResult"/>
       <b-input-group-append>
         <b-button variant="outline-info">
-          <b-icon icon="search"/>Search
+          <b-icon icon="search"/>
         </b-button>
       </b-input-group-append>
     </b-input-group>

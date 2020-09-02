@@ -2,17 +2,22 @@
   <div id="menu-box">
     <div id="menu-heading-list">
       <b-list-group
-        v-for="item in dishTypes"
-        :key="item.type"
         v-b-scrollspy:dish=390
+        flush
       >
-        <b-list-group-item
-          class="d-flex justify-content-between align-items-center"
-          :href="'#dish-card-'+item.type"
+        <div
+          v-for="item in dishTypes"
+          :key="item.type"
         >
-          {{ item.typeName }}
-          <b-badge>{{ item.orderCount }}</b-badge>
-        </b-list-group-item>
+          <b-list-group-item
+            class="d-flex justify-content-between align-items-center"
+            :href="'#dish-card-'+item.type"
+            style="min-height:10vh;padding-left:2vw;padding-right:2vw;padding-top:0;padding-bottom:0;"
+          >
+                <label style="font-size:3.5vw;display:inline;">{{ item.typeName }}</label>
+                <b-badge style="font-size:2.5vw;" variant="light">{{ item.orderCount }}</b-badge>
+          </b-list-group-item>
+        </div>
       </b-list-group>
     </div>
   </div>

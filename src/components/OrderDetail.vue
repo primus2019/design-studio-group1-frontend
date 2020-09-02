@@ -2,24 +2,24 @@
   <b-modal
     :id="orderDetailModalId"
     centered
-    hide-header
     scrollable
     ok-only
-    button-size="lg"
+    button-size="md"
+    title="Your orders"
   >
-    <b-list-group v-for="dish in dishes" :key="dish.dish_id">
-      <b-list-group-item  v-if="dish.orderCount !== 0">
-        <b-container>
-          <b-row class="mb-1">
-            <h4>{{ dish.name }}</h4>
+    <div v-if="emptyDish">No order</div>
+    <b-list-group>
+      <div v-for="dish in dishes" :key="dish.dish_id">
+        <b-list-group-item  v-if="dish.orderCount !== 0">
+          <b-row class="ml-1">
+            <label>{{ dish.name }}</label>
           </b-row>
-          <b-row align-h="center" align-v="center">
-            <b-col cols="3">
-              <h5>￥{{ dish.orderCount * dish.price }}</h5>
+          <b-row align-h="between" align-v="center">
+            <b-col xl="6" lg="6" md="6" sm="6" cols="6">
+              <p>￥{{ dish.orderCount * dish.price }}</p>
             </b-col>
-            <b-col cols="5"/>
-            <b-col cols="1">
-              <b-row align-h="center" align-v="center">
+            <b-col xl="6" lg="6" md="6" sm="6" cols="6">
+              <b-row align-h="end" align-v="center">
                 <b-button
                   variant="outline-primary"
                   class="h5"
@@ -28,15 +28,7 @@
                 >
                   <b-icon icon="dash"/>
                 </b-button>
-              </b-row>
-            </b-col>
-            <b-col cols="2">
-              <b-row align-h="center" align-v="center">
-                <h5>{{ dish.orderCount }}</h5>
-              </b-row>
-            </b-col>
-            <b-col cols="1">
-              <b-row align-h="center" align-v="center">
+                <p class="ml-2 mr-2">{{ dish.orderCount }}</p>
                 <b-button
                   variant="primary"
                   class="h5"
@@ -48,8 +40,8 @@
               </b-row>
             </b-col>
           </b-row>
-        </b-container>
-      </b-list-group-item>
+        </b-list-group-item>
+      </div>
     </b-list-group>
   </b-modal>
 </template>
@@ -96,6 +88,9 @@ export default {
     }
   },
   computed: {
+    emptyDish () {
+      return this.dishes.filter(dish => dish.orderCount > 0).length === 0
+    }
   }
 }
 </script>

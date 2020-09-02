@@ -1,99 +1,112 @@
 <template>
   <div id="dish">
-    <div
-      v-for="(dish, index) in dishes"
-      :key="dish.dish_id"
-    >
-      <!-- <b-card-group
+    <b-card-group>
+      <div
+        id="dishWidth"
+        v-for="(dish, index) in dishes"
+        :key="index"
+      >
+      <b-card
+        border-variant="light"
         :id="'dish-card-'+dish.type"
-        deck
-      > -->
-        <b-card
-          :id="'dish-card-'+dish.type"
-          class="dish-card"
-          no-body
-          @mouseover="setOverlayOn(index)"
-          @mouseout="setOverlayOn(null)"
-        >
-          <b-overlay
-            :ref="'dishCardOverlay'+index"
-            :show="overlayOn !== index"
-            style="position:absolute;height:100%"
-            variant="white"
-            :opacity="0.4"
-          >
-            <template v-slot:overlay>
-              <div/>
-            </template>
+        class="dish-card"
+        no-body
+      >
+        <b-row no-gutters>
+          <b-col xl="5" lg="5" md="5" sm="5" cols="5">
             <b-img
               :src="'data:image/png;base64,'+dish.picture"
-              style="height:100%"
+              style="width:100%;"
               :alt="dish.name"
+              rounded
             ></b-img>
-          </b-overlay>
-          <b-container style="z-index:20;position:absolute;height:100%">
-            <b-row align-h="start" align-v="end" class="mt-3 mb-5 ml-3">
-              <h1 class="mr-5">{{ dish.name }}</h1>
-              <h4>单价 ￥{{ dish.price }}</h4>
-            </b-row>
-            <b-row align-h="end" align-v="center" style="height:100%">
-              <b-col cols="7">
-                <b-row align-h="start" align-v="center">
-                  <b-button-group
-                    class="h5 pl-4 pr-4 ml-5 mb-5"
-                  >
-                    <b-button
-                      v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
-                      @click="$emit('remove', dish.dish_id)"
-                    >
-                      remove
-                    </b-button>
-                    <b-button
-                      v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
-                      @click="$emit('nudge', dish.dish_id)"
-                    >
-                      nudge
-                    </b-button>
-                  </b-button-group>
-                </b-row>
+          </b-col>
+          <b-col xl="7" lg="7" md="7" sm="7" cols="7">
+            <!-- <b-row style="margin:0;height:100%" class="d-flex flex-row justify-content-between">
+              <b-col xl="4" lg="4" md="4" sm="4" cols="4" class="d-flex flex-column justify-content-between">
+                <label>{{ dish.name }}</label>
+                <label>￥{{ dish.price }}</label>
               </b-col>
-              <b-col cols="2">
-                <h5>￥{{ dish.orderCount * dish.price }}</h5>
-              </b-col>
-              <b-col cols="1">
-                <b-row align-h="center" align-v="center">
+              <b-col xl="8" lg="8" md="8" sm="8" cols="8" class="d-flex flex-column justify-content-end">
+                <b-row align-h="end">
                   <b-button
+                    style="width:5.5vmin;height:5.5vmin;border-radius:5.5vmin;padding:0 0.5vmin;"
                     variant="outline-primary"
-                    class="h5 pl-4 pr-4"
+                    class=""
                     @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                    :disabled="dish.orderCount === 0 || !dish.selectable || orderSet"
+                    :disabled="dish.orderCount === 0 || !dish.selectable"
+                    v-if="!orderSet"
                   >
-                    <b-icon icon="dash"/>
+                    <b-icon style="width:4vmin;" icon="dash"/>
+                  </b-button>
+                  <label style="text-align:center;vertical-align:bottom;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
+                  <b-button
+                    style="width:5.5vmin;height:5.5vmin;border-radius:5.5vmin;padding:0 0.5vmin;"
+                    variant="primary"
+                    class=""
+                    @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
+                    :disabled="!dish.selectable"
+                    v-if="!orderSet"
+                  >
+                    <b-icon style="width:4vmin;" icon="plus"/>
+                  </b-button>
+                  <b-button
+                    v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
+                    @click="$emit('remove', dish.dish_id)"
+                  >
+                    remove
                   </b-button>
                 </b-row>
               </b-col>
-              <b-col cols="1">
-                <b-row align-h="center" align-v="center">
-                  <h5>{{ dish.orderCount }}</h5>
+            </b-row> -->
+            <b-row align-h="start" align-v="start" style="margin:0;height:50%;">
+              <label>{{ dish.name }}</label>
+            </b-row>
+            <b-row align-h="between" align-v="end" style="height:50%;">
+              <b-col xl="4" lg="4" md="4" sm="4" cols="4">
+                <b-row align-h="start" style="margin:0;">
+                  <label>￥{{ dish.price }}</label>
                 </b-row>
               </b-col>
-              <b-col cols="1">
-                <b-row align-h="center" align-v="center">
+              <b-col xl="8" lg="8" md="8" sm="8" cols="8">
+                <b-row align-h="end" style="margin:0;" align-v="center">
                   <b-button
-                    variant="primary"
-                    class="h5 pl-4 pr-4"
-                    @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
-                    :disabled="!dish.selectable || orderSet"
+                    style="width:5.5vmin;height:5.5vmin;border-radius:5.5vmin;padding:0 0.5vmin;"
+                    variant="outline-primary"
+                    class=""
+                    @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
+                    :disabled="dish.orderCount === 0 || !dish.selectable"
+                    v-if="!orderSet"
                   >
-                    <b-icon icon="plus"/>
+                    <b-icon style="width:4vmin;" icon="dash"/>
+                  </b-button>
+                  <label style="text-align:center;vertical-align:bottom;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
+                  <b-button
+                    style="width:5.5vmin;height:5.5vmin;border-radius:5.5vmin;padding:0 0.5vmin;"
+                    variant="primary"
+                    class=""
+                    @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
+                    :disabled="!dish.selectable"
+                    v-if="!orderSet"
+                  >
+                    <b-icon style="width:4vmin;" icon="plus"/>
+                  </b-button>
+                  <b-button
+                    v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
+                    @click="$emit('remove', dish.dish_id)"
+                  >
+                    remove
                   </b-button>
                 </b-row>
               </b-col>
             </b-row>
-          </b-container>
-        </b-card>
-      <!-- </b-card-group> -->
-    </div>
+          </b-col>
+        </b-row>
+          <!-- </b-container> -->
+        <!-- </div> -->
+      </b-card>
+      </div>
+    </b-card-group>
   </div>
 </template>
 
@@ -134,9 +147,6 @@ export default {
       // })
       // console.log('DishPane: changeOrderCount', dishId, newOrderCount)
       this.$emit('change', dishId, newOrderCount)
-    },
-    setOverlayOn (index) {
-      this.overlayOn = index
     }
   }
 }
@@ -144,12 +154,17 @@ export default {
 
 <style>
 #dish {
-  height: 75vh;
   overflow-x: hidden;
   overflow-y: auto;
 }
-.dish-card {
-  position: relative;
-  height: 25vh;
+@media all and (min-width: 576px) and (max-width: 992px) {
+  #dishWidth {
+    min-width: 100%;
+  }
+}
+@media not all and (min-width: 576px) and (max-width: 992px) {
+  #dishWidth {
+    min-width: 50%;
+  }
 }
 </style>
