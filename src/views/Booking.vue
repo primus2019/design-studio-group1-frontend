@@ -1,6 +1,6 @@
 <template>
   <div class="Booking">
-    <b-container :fluid="bookingFluid">
+    <div :fluid="bookingFluid">
       <b-row class="mb-5" align-v="center">
         <Logo :logoDir="bookingLogoDir"/>
       </b-row>
@@ -59,16 +59,16 @@
           <b-row align-h="start">
             <CheckboxInputGroup
               id="checkbox-input-show-booked-tables"
-              prompt="Show booked tables"
+              prompt="显示已预约"
               inputId="show-booked-tables-input"
               @change="handleShowBookedTableInput"
             ></CheckboxInputGroup>
-            <CheckboxInputGroup
+            <!-- <CheckboxInputGroup
               id="checkbox-input-show-unavailable-tables"
-              prompt="Show unavailable tables"
+              prompt="显示不可用桌"
               inputId="show-unavailable-tables-input"
               @change="handleshowUnavailableTablesInput"
-            ></CheckboxInputGroup>
+            ></CheckboxInputGroup> -->
           </b-row>
         </b-col>
         <b-col cols="1"/>
@@ -115,7 +115,7 @@
           <PlaceBookingButton @commit="handleCommitOperations"/>
         </b-col>
       </b-row>
-    </b-container>
+    </div>
     <Prompter prompterId="bookingPrompter" :promptText="promptText" @reset="promptText=null"/>
   </div>
 </template>
