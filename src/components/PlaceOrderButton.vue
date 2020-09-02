@@ -1,15 +1,16 @@
 <template>
-  <div>
     <b-button
       id="place-order-button"
       variant="outline-success"
       pill
-      class="h2"
+      size="sm"
       @click="addOrder"
+      style="width: 5vw;"
     >
-      {{ orderSet ? 'Change Orders' : 'Place Orders'}}
+      <p style="font-weight:bold;">
+        {{ orderSet ? '改单' : '下单' }}
+      </p>
     </b-button>
-  </div>
 </template>
 
 <script>

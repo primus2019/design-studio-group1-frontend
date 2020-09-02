@@ -6,7 +6,7 @@
       value="checked"
       unchecked-value="not_checked"
     >
-      {{ this.prompt }}
+      <p style="font-size:3.5vmin;">{{ this.prompt }}</p>
     </b-form-checkbox>
   </div>
 </template>

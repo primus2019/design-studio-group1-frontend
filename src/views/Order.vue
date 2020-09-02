@@ -1,60 +1,38 @@
 <template>
   <div class="order">
-    <b-container :fluid="orderFluid">
-      <b-row class="mb-5" align-v="center">
-        <Logo :logoDir="orderLogoDir"/>
-      </b-row>
-      <b-row align-h="end" class="mb-4">
-        <b-col cols="2">
-          <b-button pill variant="outline-info" v-b-toggle.menu-sidebar>Menu Heading</b-button>
-          <b-sidebar id="menu-sidebar" title="Menu" shadow :backdrop="menuSidebarBackdrop()">
-            <MenuHeading :dishes="dishes"/>
-          </b-sidebar>
+    <div :fluid="orderFluid">
+      <b-row align-h="between" align-v="center" style="margin:0;height:10vh;" class="bg-light">
+        <b-col xl="1" lg="2" md="2" sm="2" cols="2">
+          <b-img src="../assets/order.png" style="height:10vh;"/>
         </b-col>
-        <b-col cols="7">
+        <b-col xl="11" lg="9" md="9" sm="9" cols="9">
           <Search :dishes="dishes"/>
         </b-col>
-        <b-col cols="3">
-          <b-input-group>
-            <b-form-input
-              :disabled="orderTableIdDisable"
-              placeholder="Enter table id"
-              type="number"
-              v-model="tableId"
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                @click="orderTableIdDisable = true;"
-              >
-                confirm
-              </b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-col>
       </b-row>
-      <b-row align-h="center">
-        <b-col>
+      <b-row no-gutters style="height:80vh;overflow-x:hidden;">
+        <b-col xl="2" lg="2" md="2" sm="3" cols="3" style="height:100%">
+          <MenuHeading :dishes="dishes"/>
+        </b-col>
+        <b-col xl="10" lg="10" md="10" sm="9" cols="9" style="overflow-y:auto;height:100%;">
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
             @change="changeOrderCount"
             @remove="removeOrder"
-            @nudge="nudge"
           ></DishPane>
         </b-col>
       </b-row>
-      <b-row class="bg-light pt-3 pb-2">
-        <b-col cols="3">
+      <b-row class="bg-light" align-h="between" align-v="center" style="margin:0;height:10vh;">
+        <b-col xl="1" lg="2" md="3" sm="3" cols="3" class="">
           <b-row align-h="start" align-v="center">
             <b-avatar
-              class="mr-3"
               src="../assets/takeout-icon.png"
-              style="width:5vh;height:5vh;"
               :badge="this.orderCountSum()"
+              style="height:8vh;width:8vh;"
               v-b-modal.orderDetailModalId
               badge-top
             ></b-avatar>
-            <h2>￥{{ this.orderPriceSum() }}</h2>
+            <label style="position:absolute;left:10vh;font-size:5vh;">￥{{ this.orderPriceSum() }}</label>
             <OrderDetail
               orderDetailModalId="orderDetailModalId"
               :orderSet="orderSet"
@@ -63,39 +41,72 @@
             ></OrderDetail>
           </b-row>
         </b-col>
-        <b-col cols="5"/>
-        <b-col cols="2">
-          <b-button
-            pill
-            v-if="orderSet"
-            v-b-modal.billModalId
-          >Pay orders
-          </b-button>
-        </b-col>
-        <b-col cols="2">
-          <PlaceOrderButton
-            :orderSet="orderSet"
-            @addOrder="addOrder"
-          ></PlaceOrderButton>
+        <b-col xl="2" lg="2" md="3" sm="4" cols="5">
+          <b-row align-h="end" align-v="end" class="">
+            <b-button
+              pill
+              size="md"
+              style="width:50%;height:7vh;"
+              v-if="orderSet"
+              @click="nudge"
+            >
+              催单
+            </b-button>
+            <b-button
+              pill
+              size="md"
+              style="width:50%;height:7vh;"
+              v-if="orderSet"
+              v-b-modal.billModalId
+            >
+              支付
+            </b-button>
+            <b-button
+              pill
+              size="md"
+              style="width:50%;height:7vh;"
+              @click="addOrder"
+              variant="primary"
+            >
+              {{ orderSet ? '改单' : '去结算' }}
+            </b-button>
+          </b-row>
         </b-col>
       </b-row>
-    </b-container>
+    </div>
     <Prompter prompterId="orderPrompter" :promptText="promptText" @reset="promptText=null"/>
-    <Bill
-      billModalId="billModalId"
-      :dishes="dishes"
-      @pay="pay"
-    ></Bill>
+    <Bill billModalId="billModalId" :dishes="dishes" @pay="pay"></Bill>
+    <b-modal
+      id="orderTableIdModal"
+      centered
+      title="桌号"
+      ok-only
+      hide-header-close
+      no-close-on-backdrop
+      no-close-on-esc
+      @ok.prevent="
+      ![null, ''].includes(tableId) ?
+        $nextTick(() => $bvModal.hide('orderTableIdModal')) :
+        prompt('请输入桌号');"
+    >
+      <b-form>
+        <label for="orderTableIdInput">您的桌号</label>
+        <b-form-input
+          id="orderTableIdInput"
+          v-model="tableId"
+          type="number"
+        ></b-form-input>
+      </b-form>
+    </b-modal>
   </div>
 </template>
 
 <script>
-import Logo from '../components/Logo'
 import OrderDetail from '../components/OrderDetail'
 import Search from '../components/Search'
 import MenuHeading from '../components/MenuHeading'
 import DishPane from '../components/DishPane'
-import PlaceOrderButton from '../components/PlaceOrderButton'
+// import PlaceOrderButton from '../components/PlaceOrderButton'
 import axios from 'axios'
 import Prompter from '../components/Prompter'
 import Bill from '../components/Bill'
@@ -103,19 +114,18 @@ import Bill from '../components/Bill'
 export default {
   name: 'Order',
   components: {
-    Logo,
     OrderDetail,
     Search,
     MenuHeading,
     DishPane,
-    PlaceOrderButton,
+    // PlaceOrderButton,
     Prompter,
     Bill
   },
   data () {
     return {
       orderLogoDir: 'order.png',
-      orderFluid: 'xl',
+      orderFluid: true,
       dishes: [],
       takeoutId: -1,
       promptText: null,
@@ -344,6 +354,45 @@ export default {
     })
       .then(res => this.convertStaticDishes(res.data.dishes))
       .catch(err => console.log(err))
+    this.$bvModal.show('orderTableIdModal')
   }
 }
 </script>
+
+<style>
+label {
+  font-size: 4vmin;
+  font-weight: 700;
+  display: inline;
+}
+h6 {
+  font-size: 2.0vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h5 {
+  font-size: 2.5vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h4 {
+  font-size: 3.0vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h3 {
+  font-size: 3.5vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h2 {
+  font-size: 3.6vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h1 {
+  font-size: 4.0vmin;
+  vertical-align: middle;
+  display: inline;
+}
+</style>
