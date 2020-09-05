@@ -140,13 +140,15 @@ export default {
   },
   methods: {
     changeOrderCount (dishId, newOrderCount) {
-      // this.dishes.forEach((dish) => {
-      //   if (dish.dish_id === dishId) {
-      //     dish.orderCount = newOrderCount
-      //   }
-      // })
+      var oldOrderCount = 0
+      this.dishes.forEach((dish) => {
+        if (dish.dish_id === dishId) {
+          oldOrderCount = dish.orderCount
+          dish.orderCount = newOrderCount
+        }
+      })
       // console.log('DishPane: changeOrderCount', dishId, newOrderCount)
-      this.$emit('change', dishId, newOrderCount)
+      this.$emit('change', dishId, newOrderCount, oldOrderCount)
     }
   }
 }

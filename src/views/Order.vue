@@ -68,7 +68,7 @@
               @click="addOrder"
               variant="primary"
             >
-              {{ orderSet ? '改单' : '去结算' }}
+              {{ orderSet ? '改单' : '下单' }}
             </b-button>
           </b-row>
         </b-col>
@@ -153,9 +153,6 @@ export default {
       }
       return tmpSum.toString()
     },
-    menuSidebarBackdrop () {
-      return this.isMobile
-    },
     extendDishesDict (tmpDish) {
       for (var i = 0; i < this.dishes.length; i++) {
         tmpDish.orderCount = i
@@ -163,17 +160,21 @@ export default {
         this.dishes[i] = tmpDish
       }
     },
-    // TODO: /api/dish_residue: request/response
-    changeOrderCount (dishId, newOrderCount) {
-      this.dishes.forEach((dish) => {
-        if (dish.dish_id === dishId) {
-          dish.orderCount = newOrderCount
+    dishIndex (dishId) {
+      for (var i = 0; i < this.dishes.length; i++) {
+        if (this.dishes[i].dish_id === dishId) {
+          return this.dishes[i].dish_id
         }
-      })
+      }
+      this.prompt('Fail to find dish id')
+      return -1
+    },
+    // TODO: /api/dish_residue: request/response
+    changeOrderCount (dishId, newOrderCount, oldOrderCount) {
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
-      console.log('parent dish_residue request', {
+      console.log('dish_residue request', {
         method: 'get',
         url: 'http://localhost:8081/api/dish_residue',
         params: { dishes: newOrder }
@@ -184,8 +185,15 @@ export default {
         params: { dishes: newOrder }
       })
         .then((res) => {
-          console.log('parent dish_residue response.data', res.data)
-          this.handleSoldout(res.data.dishes)
+          console.log('dish_residue response.data', res.data)
+          const soldOut = this.handleSoldout(res.data.dishes, dishId, newOrderCount)
+          if (soldOut) {
+            this.dishes.forEach((dish) => {
+              if (dish.dish_id === dishId) {
+                dish.orderCount = oldOrderCount
+              }
+            })
+          }
         })
         .catch((err) => console.log(err))
     },
@@ -199,8 +207,10 @@ export default {
         }
         if (soldOutList.length !== 0) {
           this.prompt(soldOutList.join(','), 'has sold out!')
+          return true
         }
       }
+      return false
     },
     // /api/add_order: request/response (order only for now)
     // it should use the table related api
@@ -212,7 +222,7 @@ export default {
       const newOrder = this.dishes
         .filter(dish => dish.orderCount > 0)
         .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
-      console.log('parent add_order request', {
+      console.log('add_order request', {
         method: 'post',
         url: 'http://localhost:8081/api/add_order',
         data: { table_id: this.tableId, dishes: newOrder }
@@ -223,7 +233,7 @@ export default {
         data: { table_id: this.tableId, dishes: newOrder }
       })
         .then((res) => {
-          console.log('parent add_order response.data', res.data)
+          console.log('add_order response.data', res.data)
           if (res.data.success === 1) {
             this.prompt('Your orders are all set!')
             this.orderSet = true
@@ -234,25 +244,27 @@ export default {
         })
         .catch((err) => console.log(err))
     },
-    // TODO: /api/remove_dish: request/response
+    // TODO: /api/remove_order: request/response
     removeOrder (dishId) {
       axios({
         method: 'post',
         url: 'http://localhost:8081/api/remove_order',
         data: {
           table_id: this.tableId,
-          dishes: {
-            dish_id: dishId,
-            count: 1
-          }
+          dishes: { dish_id: dishId, count: 1 }
         }
       })
         .then((res) => {
-          if (res.data.success === 1) {
-            this.prompt('菜品删除成功')
-            this.dishes[dishId].orderCount -= 1
-          } else if (res.data.success === 0) {
-            this.prompt('菜品删除失败')
+          switch (res.data.success) {
+            case 0:
+              this.prompt('菜品删除失败')
+              break
+            case 1:
+              this.prompt('菜品删除成功')
+              this.dishes[this.dishIndex(dishId)] -= 1
+              break
+            default:
+              this.prompt('bug: unexpected success in remove_order', res.data.success)
           }
         })
         .catch((err) => console.log(err))
@@ -265,6 +277,7 @@ export default {
         data: { table_id: this.tableId }
       })
         .catch((err) => console.log(err))
+      this.prompt('催单成功')
     },
     convertStaticDishes (dishes) {
       this.dishes = []
@@ -337,15 +350,7 @@ export default {
         })
     }
   },
-  computed: {
-    isMobile () {
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true
-      } else {
-        return false
-      }
-    }
-  },
+  // /api/dish: request/response
   mounted () {
     const path = 'http://localhost:8081/api/dish'
     axios({

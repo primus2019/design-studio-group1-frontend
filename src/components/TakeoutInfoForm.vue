@@ -1,14 +1,9 @@
 <template>
   <div>
-    <b-button
-      @click="$bvModal.show(id)"
-    >
-      Enter your information
-    </b-button>
     <b-modal
       :id="id"
       centered
-      title="Takeout Information"
+      title="个人信息"
       @show="reset"
       @hidden="reset"
     >
@@ -18,7 +13,7 @@
             @click="handleOk"
             :disabled="disable || confirm"
           >
-            Confirm
+            确认
           </b-button>
         </b-row>
         <b-row>
@@ -26,13 +21,13 @@
             @click="confirm=false;reset();"
             :disabled="disable"
           >
-            Reset
+            重置
           </b-button>
         </b-row>
       </template>
       <b-form-group>
         <b-form>
-          <label :for="id+'Name'">Name</label>
+          <label :for="id+'Name'">姓名</label>
           <b-form-input
             :id="id+'Name'"
             :ref="id+'Name'"
@@ -43,11 +38,11 @@
             :disabled="disable || confirm"
           ></b-form-input>
           <b-form-invalid-feedback id="input-type-check-name">
-            Please enter name
+            请输入姓名
           </b-form-invalid-feedback>
         </b-form>
         <b-form>
-          <label :for="id+'Phone'">Phone</label>
+          <label :for="id+'Phone'">手机</label>
           <b-form-input
             :id="id+'Phone'"
             :ref="id+'Phone'"
@@ -58,11 +53,11 @@
             :disabled="disable || confirm"
           ></b-form-input>
           <b-form-invalid-feedback id="input-type-check-phone">
-            Please enter phone
+            请输入手机
           </b-form-invalid-feedback>
         </b-form>
         <b-form>
-          <label :for="id+'Address'">Address</label>
+          <label :for="id+'Address'">地址</label>
           <b-form-input
             :id="id+'Address'"
             :ref="id+'Address'"
@@ -72,7 +67,7 @@
             :disabled="disable || confirm"
           ></b-form-input>
           <b-form-invalid-feedback id="input-type-check-address">
-            Please enter address
+            请输入地址
           </b-form-invalid-feedback>
         </b-form>
       </b-form-group>

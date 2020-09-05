@@ -11,6 +11,8 @@
       head-variant="light"
       table-variant="light"
       hover
+      sticky-header="80vh"
+      style="overflow-x:hidden;"
     >
       <template v-slot:cell(operations)="singleTable">
         <b-row align-h="start">
@@ -22,7 +24,7 @@
               v-if="singleTable.item.book_status === 1"
               @click="updateOperation('book', singleTable.item.table_id)"
             >
-              Book
+              预定
             </b-button>
             <b-button
               size="sm"
@@ -31,7 +33,7 @@
               @click="updateOperation('merge', singleTable.item.table_id)"
               v-if="isCurrent"
             >
-              Merge
+              并台
             </b-button>
             <b-button
               size="sm"
@@ -40,7 +42,7 @@
               @click="updateOperation('finish', singleTable.item.table_id)"
               v-if="isCurrent && singleTable.item.book_status === 0"
             >
-              Finish
+              关台
             </b-button>
             <b-button
               size="sm"
@@ -49,7 +51,7 @@
               v-if="singleTable.item.book_status === 1 && isCurrent"
               @click="updateOperation('open', singleTable.item.table_id)"
             >
-              Open
+              开台
             </b-button>
           </b-button-group>
         </b-row>

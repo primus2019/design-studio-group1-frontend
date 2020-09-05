@@ -1,14 +1,12 @@
 <template>
-  <div class="checkbox-input">
-    <b-form-checkbox
-      :id="checkboxId"
-      v-model="checkboxInput"
-      value="checked"
-      unchecked-value="not_checked"
-    >
-      <p style="font-size:3.5vmin;">{{ this.prompt }}</p>
-    </b-form-checkbox>
-  </div>
+  <b-form-checkbox
+    :id="checkboxId"
+    v-model="checkboxInput"
+    value="checked"
+    unchecked-value="not_checked"
+  >
+    <p style="font-size:3.5vmin;">{{ this.prompt }}</p>
+  </b-form-checkbox>
 </template>
 
 <script>
@@ -39,9 +37,4 @@ export default {
 </script>
 
 <style>
-.check-box-input {
-  /* position: absolute; */
-  width: 160px;
-  height: 24px;
-}
 </style>
