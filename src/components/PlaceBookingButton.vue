@@ -3,7 +3,7 @@
     <b-dropdown
       class="place-booking-button"
       variant="outline-success"
-      text="Commit operations"
+      text="提交"
     >
       <div
         v-for="operation in operationList"
@@ -41,17 +41,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.place-booking {
-  vertical-align: middle;
-}
-.place-booking-button {
-  /* position: absolute; */
-  width: 144.02px;
-  height: 38px;
-  /* left: 1252px;
-  top: 963px; */
-  z-index: 1;
-}
-</style>

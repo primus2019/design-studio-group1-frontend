@@ -1,11 +1,13 @@
 <template>
   <div class="Booking">
-    <div :fluid="bookingFluid">
-      <b-row class="mb-5" align-v="center">
-        <Logo :logoDir="bookingLogoDir"/>
+    <b-container :fluid="bookingFluid">
+      <b-row class="bg-light" align-v="center" align-h="start" style="height:5vh;">
+        <b-col>
+          <b-img src="../assets/booking.png" style="height:5vh;"/>
+        </b-col>
       </b-row>
-      <b-row class="mt-3 mb-3" align-h="center">
-        <b-col cols="6">
+      <b-row>
+        <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-date"
             prompt="Booking Date:"
@@ -20,7 +22,7 @@
             :reset="inputGroupBookingDateReset"
           ></PromptInputGroup>
         </b-col>
-        <b-col cols="6">
+        <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-time"
             prompt="Booking Time:"
@@ -34,8 +36,8 @@
           ></PromptInputGroup>
         </b-col>
       </b-row>
-      <b-row class="mt-3 mb-3" align-h="center" align-v="end">
-        <b-col cols="6">
+      <b-row>
+        <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-guest-number"
             prompt="Guest Number:"
@@ -50,19 +52,21 @@
             :reset="inputGroupBookingGuestNumberReset"
           ></PromptInputGroup>
         </b-col>
-        <b-col cols="2">
-          <b-row align-h="start" class="ml-auto">
+        <b-col xl="1" lg="1" md="1" sm="1" cols="1" style="vertical-align:bottom;">
+          <b-row align-h="start" align-v="end" class="ml-auto" style="height:100%;">
             <SearchTableButton @search="reviewTable"/>
           </b-row>
         </b-col>
-        <b-col cols="3">
-          <b-row align-h="start">
-            <CheckboxInputGroup
-              id="checkbox-input-show-booked-tables"
-              prompt="显示已预约"
-              inputId="show-booked-tables-input"
-              @change="handleShowBookedTableInput"
-            ></CheckboxInputGroup>
+        <b-col xl="5" lg="5" md="5" sm="5" cols="5" style="vertical-align:bottom;">
+          <b-row align-h="center" align-v="end" class="ml-auto" style="height:100%;">
+            <input
+              type="checkbox"
+              v-model="showBookedTables"
+              :autocomplete="false"
+              style="height:50%;width:2.5vmin;"
+              class="mr-1 mb-1"
+            />
+            <p style="font-size:2.5vmin;margin:0;height:50%;">显示已预约</p>
             <!-- <CheckboxInputGroup
               id="checkbox-input-show-unavailable-tables"
               prompt="显示不可用桌"
@@ -71,7 +75,6 @@
             ></CheckboxInputGroup> -->
           </b-row>
         </b-col>
-        <b-col cols="1"/>
       </b-row>
       <b-row>
         <b-col>
@@ -84,47 +87,47 @@
           ></TableList>
         </b-col>
       </b-row>
-      <b-row class="bg-light pt-3 pb-2" align-h="end">
-        <b-col cols="2">
+      <b-row class="bg-light" align-h="end">
+        <b-col xl="2" lg="2" md="2" sm="2" cols="2">
           <b-form-input
             placeholder="Book serial"
             v-model="bookSerial"
           ></b-form-input>
         </b-col>
-        <b-col cols="1">
-          <b-button
-            variant="outline-info"
-            @click="open(true)"
-          >
-            Open
-          </b-button>
+        <b-col xl="2" lg="2" md="2" sm="2" cols="2">
+          <b-button-group>
+            <b-button
+              variant="outline-info"
+              @click="open(true)"
+            >
+              开台
+            </b-button>
+            <b-button
+              variant="outline-primary"
+              @click="cancel"
+            >
+              销号
+            </b-button>
+          </b-button-group>
         </b-col>
-        <b-col cols="1">
-          <b-button
-            variant="outline-primary"
-            @click="cancel"
-          >
-            Cancel
-          </b-button>
-        </b-col>
-        <b-col cols="4"/>
-        <b-col cols="2">
-          <CheckBooking :operations="operations" @remove="removeOperations"/>
-        </b-col>
-        <b-col cols="2">
-          <PlaceBookingButton @commit="handleCommitOperations"/>
+        <b-col xl="4" lg="4" md="4" sm="4" cols="4"/>
+        <b-col xl="4" lg="4" md="4" sm="4" cols="4">
+          <b-row align-h="end">
+            <b-button-group>
+              <CheckBooking :operations="operations" @remove="removeOperations"/>
+              <PlaceBookingButton @commit="handleCommitOperations"/>
+            </b-button-group>
+          </b-row>
         </b-col>
       </b-row>
-    </div>
+    </b-container>
     <Prompter prompterId="bookingPrompter" :promptText="promptText" @reset="promptText=null"/>
   </div>
 </template>
 
 <script>
-import Logo from '../components/Logo'
 import PromptInputGroup from '../components/PromptInputGroup'
 import SearchTableButton from '../components/SearchTableButton'
-import CheckboxInputGroup from '../components/CheckboxInputGroup'
 import TableList from '../components/TableList'
 import CheckBooking from '../components/CheckBooking'
 import PlaceBookingButton from '../components/PlaceBookingButton'
@@ -134,10 +137,8 @@ import Prompter from '../components/Prompter'
 export default {
   name: 'Booking',
   components: {
-    Logo,
     PromptInputGroup,
     SearchTableButton,
-    CheckboxInputGroup,
     TableList,
     CheckBooking,
     PlaceBookingButton,
@@ -177,7 +178,7 @@ export default {
       BookingGuestNumber: null,
       showBookedTables: false,
       showUnavailableTables: false,
-      bookingFluid: 'xl',
+      bookingFluid: false,
       tables: null,
       inputGroupBookingDateReset: false,
       inputGroupBookingTimeReset: false,
@@ -287,7 +288,7 @@ export default {
     handleOperation (operation, tableId) {
       if (['open', 'book', 'merge'].includes(operation)) {
         if (this.operations[operation].includes(tableId)) {
-          this.prompt('Duplicated operation!', operation, tableId)
+          this.prompt('请勿重复操作', operation, tableId)
         } else {
           this.operations[operation].push(tableId)
           console.log('parent operations updated', operation, tableId)
@@ -341,7 +342,7 @@ export default {
     },
     // /api/review_table: request/response
     reviewTable () {
-      console.log('parent review_table request', {
+      console.log('review_table request', {
         method: 'get',
         url: 'http://localhost:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
@@ -357,7 +358,6 @@ export default {
           this.updateTables(res.data.book_status)
         })
         .catch((err) => console.log(err))
-      console.log('parent review tables', this.tables)
     },
     handleCommitOperations (operation) {
       console.log('parent commit operation', operation, this.operations[operation])
@@ -389,7 +389,7 @@ export default {
     },
     // /api/add_book: request/response
     book () {
-      console.log('Parent book request', {
+      console.log('add_book request', {
         book_time: this.getValidDateTime(),
         table_id_list: this.operations.book
       })
@@ -402,7 +402,7 @@ export default {
         }
       })
         .then((res) => {
-          console.log('parent book response', res)
+          console.log('add_book response.data', res.data)
           switch (res.data.book_status) {
             case 0:
               this.prompt('该时段已预定满')
@@ -414,7 +414,7 @@ export default {
               this.prompt('预定时间非法')
               break
             default:
-              console.log('bug: book opreation receives unexpected book_status in response')
+              this.prompt('bug: add_book receives unexpected book_status in response')
           }
         })
         .catch(err => console.log(err))
@@ -422,16 +422,25 @@ export default {
     },
     // /api/cancel_book: request/response
     cancel () {
+      if (!this.bookSerial) {
+        this.prompt('请填写预约流水号')
+        return
+      }
       axios({
         method: 'post',
         url: 'http://localhost:8081/api/cancel_book',
         data: { book_serial: this.bookSerial }
       })
         .then((res) => {
-          if (res.data.cancel_status === 1) {
-            this.prompt('流水号为' + res.data.book_serial + '的预定取消成功')
-          } else {
-            this.prompt('流水号为' + res.data.book_serial + '的预定取消失败')
+          switch (res.data.cancel_status) {
+            case 0:
+              this.prompt('流水号为' + res.data.book_serial + '的预定取消失败')
+              break
+            case 1:
+              this.prompt('流水号为' + res.data.book_serial + '的预定取消成功')
+              break
+            default:
+              this.prompt('bug: cancel_book receives unexpected cancel_status', res.data.cancel_status)
           }
         })
         .catch(err => console.log(err))
@@ -439,7 +448,11 @@ export default {
     },
     // TODO: /api/open_table: request/response
     open (book = false) {
-      console.log('parent open request', {
+      if (!this.bookSerial && book) {
+        this.prompt('请填写预约流水号')
+        return
+      }
+      console.log('open_table request', {
         method: 'post',
         url: 'http://localhost:8081/api/open_table',
         data: {
@@ -456,6 +469,7 @@ export default {
         }
       })
         .then((res) => {
+          console.log('open_table response.data', res.data)
           if (book) {
             switch (res.data.open_status) {
               case 0:
@@ -502,7 +516,7 @@ export default {
         this.prompt('并台队列无合法主桌')
         return
       }
-      console.log('parent merge request', {
+      console.log('merge_table request', {
         method: 'post',
         url: 'http://localhost:8081/api/merge_table',
         data: {
@@ -519,7 +533,7 @@ export default {
         }
       })
         .then((res) => {
-          console.log('parent merge response.data', res.data)
+          console.log('merge_table response.data', res.data)
           if (res.data.merge_status === 0) {
             this.prompt('并台成功, 主桌号:', res.data.main_table_id)
           } else if (res.data.merge_status === 1) {
@@ -538,13 +552,16 @@ export default {
         data: { table_id: this.operations.finish[0] }
       })
         .then((res) => {
-          console.log('parent finish response.data', res.data)
-          if (res.data.finish_status === 0) {
-            this.prompt('桌号' + res.data.table_id + '撤台成功')
-          } else if (res.data.finish_status === 1) {
-            this.prompt('桌号' + res.data.table_id + '撤台失败')
-          } else {
-            this.prompt('bug: unexpected finish_status in /api/finish_table: response')
+          console.log('finish_table response.data', res.data)
+          switch (res.data.finish_status) {
+            case 0:
+              this.prompt('桌号' + res.data.table_id + '撤台成功')
+              break
+            case 1:
+              this.prompt('桌号' + res.data.table_id + '撤台失败')
+              break
+            default:
+              this.prompt('bug: unexpected finish_status in /api/finish_table: response')
           }
         })
         .catch((err) => console.log(err))
@@ -552,7 +569,7 @@ export default {
   },
   mounted () {
     this.reviewTable()
-    console.log('parent mounted tables', this.tables)
+    console.log('mounted review_table')
   }
 }
 </script>

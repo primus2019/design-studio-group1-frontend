@@ -1,6 +1,6 @@
 <template>
   <div class="prompt-input-group">
-    <label :for="inputId">{{ this.prompt }}</label>
+    <label :for="inputId" style="font-size:2.5vmin;">{{ this.prompt }}</label>
     <b-form-input
       required
       :id="inputId"

@@ -1,51 +1,38 @@
 <template>
   <div class="order">
-    <b-container :fluid="orderFluid">
-      <b-row class="mb-5" align-v="center">
-        <Logo :logoDir="orderLogoDir"/>
-      </b-row>
-      <b-row align-h="end" class="mb-4">
-        <b-col cols="2">
-          <b-button pill variant="outline-info" v-b-toggle.menu-sidebar>Menu Heading</b-button>
-          <b-sidebar id="menu-sidebar" title="Menu" shadow :backdrop="menuSidebarBackdrop()">
-            <MenuHeading :dishes="dishes"/>
-          </b-sidebar>
+    <div :fluid="orderFluid">
+      <b-row align-h="between" align-v="center" style="margin:0;height:10vh;" class="bg-light">
+        <b-col xl="1" lg="2" md="3" sm="3" cols="3">
+          <b-img src="../assets/order.png" style="height:10vh;"/>
         </b-col>
-        <b-col cols="7">
+        <b-col xl="11" lg="10" md="9" sm="9" cols="9">
           <Search :dishes="dishes"/>
         </b-col>
-        <b-col cols="3">
-          <TakeoutInfoForm
-            id="takeoutInfoForm"
-            :disable="orderSet"
-            @submit="handleTakeoutInfo"
-          ></TakeoutInfoForm>
-        </b-col>
       </b-row>
-      <b-row align-h="center">
-        <b-col>
+      <b-row no-gutters style="height:80vh;overflow-x:hidden;">
+        <b-col xl="2" lg="2" md="2" sm="3" cols="3" style="height:100%">
+          <MenuHeading :dishes="dishes"/>
+        </b-col>
+        <b-col xl="10" lg="10" md="10" sm="9" cols="9" style="overflow-y:auto;height:100%;">
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
-            :isTakeout="true"
             @change="changeOrderCount"
             @remove="removeOrder"
-            @nudge="nudge"
           ></DishPane>
         </b-col>
       </b-row>
-      <b-row class="bg-light pt-3 pb-2">
-        <b-col cols="3">
+      <b-row class="bg-light" align-h="between" align-v="center" style="margin:0;height:10vh;">
+        <b-col xl="1" lg="2" md="3" sm="3" cols="3" class="">
           <b-row align-h="start" align-v="center">
             <b-avatar
-              class="mr-3"
               src="../assets/takeout-icon.png"
-              style="width:5vh;height:5vh;"
               :badge="this.orderCountSum()"
+              style="height:8vh;width:8vh;"
               v-b-modal.orderDetailModalId
               badge-top
             ></b-avatar>
-            <h2>￥{{ this.orderPriceSum() }}</h2>
+            <label style="position:absolute;left:10vh;font-size:5vh;">￥{{ this.orderPriceSum() }}</label>
             <OrderDetail
               orderDetailModalId="orderDetailModalId"
               :orderSet="orderSet"
@@ -54,39 +41,42 @@
             ></OrderDetail>
           </b-row>
         </b-col>
-        <b-col cols="5"/>
-        <b-col cols="2">
-          <b-button
-            pill
-            v-if="orderSet"
-            v-b-modal.billModalId
-          >Pay orders
-          </b-button>
-        </b-col>
-        <b-col cols="2">
-          <PlaceOrderButton
-            :orderSet="orderSet"
-            @addOrder="addTakeout"
-          ></PlaceOrderButton>
+        <b-col xl="2" lg="2" md="3" sm="4" cols="5">
+          <b-row align-h="end" align-v="end">
+            <b-button-group>
+              <b-button
+                @click="$bvModal.show('takeoutInfoForm')"
+                variant="outline-primary"
+                style="width:50%;height:7vh;"
+                size="md"
+              >
+                <!-- <p style="font-size: 4vw; display: inline;">配送信息</p> -->
+                配送
+              </b-button>
+              <b-button
+                size="md"
+                style="width:50%;height:7vh;"
+                @click="addTakeout"
+                variant="primary"
+              >
+                {{ orderSet ? '改单' : '下单' }}
+              </b-button>
+            </b-button-group>
+          </b-row>
         </b-col>
       </b-row>
-    </b-container>
+    </div>
+    <TakeoutInfoForm id="takeoutInfoForm" :disable="orderSet" @submit="handleTakeoutInfo"/>
     <Prompter prompterId="orderPrompter" :promptText="promptText" @reset="promptText=null"/>
-    <Bill
-      billModalId="billModalId"
-      :dishes="dishes"
-      @pay="pay"
-    ></Bill>
+    <Bill billModalId="billModalId" :dishes="dishes" @pay="pay"></Bill>
   </div>
 </template>
 
 <script>
-import Logo from '../components/Logo'
 import OrderDetail from '../components/OrderDetail'
 import Search from '../components/Search'
 import MenuHeading from '../components/MenuHeading'
 import DishPane from '../components/DishPane'
-import PlaceOrderButton from '../components/PlaceOrderButton'
 import axios from 'axios'
 import Prompter from '../components/Prompter'
 import Bill from '../components/Bill'
@@ -95,12 +85,10 @@ import TakeoutInfoForm from '../components/TakeoutInfoForm'
 export default {
   name: 'Order',
   components: {
-    Logo,
     OrderDetail,
     Search,
     MenuHeading,
     DishPane,
-    PlaceOrderButton,
     Prompter,
     Bill,
     TakeoutInfoForm
@@ -108,17 +96,17 @@ export default {
   data () {
     return {
       orderLogoDir: 'order.png',
-      orderFluid: 'xl',
+      orderFluid: true,
       dishes: [],
-      takeoutId: null,
+      takeoutId: -1,
       promptText: null,
       tableId: null,
       orderTableIdDisable: false,
       orderSet: false,
       paymentMethod: null,
-      takeoutName: null,
-      takeoutPhone: null,
-      takeoutAddress: null
+      name: null,
+      phone: null,
+      address: null
     }
   },
   methods: {
@@ -139,9 +127,6 @@ export default {
       }
       return tmpSum.toString()
     },
-    menuSidebarBackdrop () {
-      return this.isMobile
-    },
     extendDishesDict (tmpDish) {
       for (var i = 0; i < this.dishes.length; i++) {
         tmpDish.orderCount = i
@@ -149,23 +134,21 @@ export default {
         this.dishes[i] = tmpDish
       }
     },
-    handleTakeoutInfo (dict) {
-      this.takeoutName = dict.name
-      this.takeoutPhone = dict.phone
-      this.takeoutAddress = dict.address
-      console.log('parent handle tabkeout info', dict)
+    dishIndex (dishId) {
+      for (var i = 0; i < this.dishes.length; i++) {
+        if (this.dishes[i].dish_id === dishId) {
+          return this.dishes[i].dish_id
+        }
+      }
+      this.prompt('Fail to find dish id')
+      return -1
     },
     // TODO: /api/dish_residue: request/response
-    changeOrderCount (dishId, newOrderCount) {
-      this.dishes.forEach((dish) => {
-        if (dish.dish_id === dishId) {
-          dish.orderCount = newOrderCount
-        }
-      })
+    changeOrderCount (dishId, newOrderCount, oldOrderCount) {
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
-      console.log('parent dish_residue request', {
+      console.log('dish_residue request', {
         method: 'get',
         url: 'http://localhost:8081/api/dish_residue',
         params: { dishes: newOrder }
@@ -176,8 +159,15 @@ export default {
         params: { dishes: newOrder }
       })
         .then((res) => {
-          console.log('parent dish_residue response.data', res.data)
-          this.handleSoldout(res.data.dishes)
+          console.log('dish_residue response.data', res.data)
+          const soldOut = this.handleSoldout(res.data.dishes, dishId, newOrderCount)
+          if (soldOut) {
+            this.dishes.forEach((dish) => {
+              if (dish.dish_id === dishId) {
+                dish.orderCount = oldOrderCount
+              }
+            })
+          }
         })
         .catch((err) => console.log(err))
     },
@@ -191,20 +181,50 @@ export default {
         }
         if (soldOutList.length !== 0) {
           this.prompt(soldOutList.join(','), 'has sold out!')
+          return true
         }
       }
+      return false
+    },
+    // /api/add_order: request/response (order only for now)
+    // it should use the table related api
+    addOrder () {
+      const newOrder = this.dishes
+        .filter(dish => dish.orderCount > 0)
+        .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
+      console.log('add_order request', {
+        method: 'post',
+        url: 'http://localhost:8081/api/add_order',
+        data: { table_id: this.tableId, dishes: newOrder }
+      })
+      axios({
+        method: 'post',
+        url: 'http://localhost:8081/api/add_order',
+        data: { table_id: this.tableId, dishes: newOrder }
+      })
+        .then((res) => {
+          console.log('add_order response.data', res.data)
+          if (res.data.success === 1) {
+            this.prompt('Your orders are all set!')
+            this.orderSet = true
+          } else {
+            var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
+            this.prompt(soldOutList.join(','), 'has been sold out; your order fails!')
+          }
+        })
+        .catch((err) => console.log(err))
     },
     // /api/add_takeout: request/response
     addTakeout () {
-      if (!this.takeoutName) {
+      if (!this.name) {
         this.prompt('请输入姓名')
         return
       }
-      if (!this.takeoutPhone) {
+      if (!this.phone) {
         this.prompt('请输入手机号')
         return
       }
-      if (!this.takeoutAddress) {
+      if (!this.address) {
         this.prompt('请输入地址')
         return
       }
@@ -216,9 +236,9 @@ export default {
         url: 'http://localhost:8081/api/add_takeout',
         data: {
           dishes: newOrder,
-          name: this.takeoutName,
-          phone: this.takeoutPhone,
-          address: this.takeoutAddress
+          name: this.name,
+          phone: this.phone,
+          address: this.address
         }
       })
       axios({
@@ -226,9 +246,9 @@ export default {
         url: 'http://localhost:8081/api/add_takeout',
         data: {
           dishes: newOrder,
-          name: this.takeoutName,
-          phone: this.takeoutPhone,
-          address: this.takeoutAddress
+          name: this.name,
+          phone: this.phone,
+          address: this.address
         }
       })
         .then((res) => {
@@ -307,10 +327,6 @@ export default {
       return tmpSum
     },
     // TODO: /g3/confirm_payment: request/response
-    //
-    //
-    //
-    //
     pay (method) {
       this.paymentMethod = method
       axios({
@@ -336,7 +352,8 @@ export default {
         method: 'post',
         url: 'http://localhost:8081/g3/confirm_payment',
         data: {
-          payment_method: this.paymentMethod
+          payment_method: this.paymentMethod,
+          telephone: this.telephone
         }
       })
         .then((res) => {
@@ -348,17 +365,14 @@ export default {
             this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
           }
         })
+    },
+    handleTakeoutInfo (info) {
+      this.name = info.name
+      this.phone = info.phone
+      this.address = info.address
     }
   },
-  computed: {
-    isMobile () {
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true
-      } else {
-        return false
-      }
-    }
-  },
+  // /api/dish: request/response
   mounted () {
     const path = 'http://localhost:8081/api/dish'
     axios({
@@ -367,6 +381,45 @@ export default {
     })
       .then(res => this.convertStaticDishes(res.data.dishes))
       .catch(err => console.log(err))
+    this.$bvModal.show('orderTableIdModal')
   }
 }
 </script>
+
+<style>
+label {
+  font-size: 4vmin;
+  font-weight: 700;
+  display: inline;
+}
+h6 {
+  font-size: 2.0vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h5 {
+  font-size: 2.5vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h4 {
+  font-size: 3.0vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h3 {
+  font-size: 3.5vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h2 {
+  font-size: 3.6vmin;
+  vertical-align: middle;
+  display: inline;
+}
+h1 {
+  font-size: 4.0vmin;
+  vertical-align: middle;
+  display: inline;
+}
+</style>

@@ -1,9 +1,12 @@
 <template>
   <div>
     <b-input-group>
-      <b-form-input list="orderSearchList" v-model="orderSearchResult"/>
+      <b-form-input
+        list="orderSearchList"
+        v-model="orderSearchResult"
+      />
       <b-input-group-append>
-        <b-button variant="outline-info">
+        <b-button variant="outline-info" style="min-width: 5vw;">
           <b-icon icon="search"/>
         </b-button>
       </b-input-group-append>

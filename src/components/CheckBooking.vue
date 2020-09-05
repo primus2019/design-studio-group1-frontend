@@ -6,7 +6,7 @@
       v-b-modal.checkBookingModal
       @click="showOperations"
     >
-      Check Bookings
+      查看
     </b-button>
     <b-modal
       id="checkBookingModal"
@@ -81,14 +81,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.check-booking-button {
-  /* position: absolute; */
-  width: 151px;
-  height: 38px;
-  /* left: 1080px;
-  top: 963px; */
-  z-index: 1;
-}
-</style>

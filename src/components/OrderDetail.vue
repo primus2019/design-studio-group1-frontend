@@ -79,12 +79,14 @@ export default {
   },
   methods: {
     changeOrderCount (dishId, newOrderCount) {
+      var oldOrderCount = 0
       this.dishes.forEach((dish) => {
         if (dish.dish_id === dishId) {
+          oldOrderCount = dish.orderCount
           dish.orderCount = newOrderCount
         }
       })
-      this.$emit('change', dishId, newOrderCount)
+      this.$emit('change', dishId, newOrderCount, oldOrderCount)
     }
   },
   computed: {
