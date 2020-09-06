@@ -344,13 +344,13 @@ export default {
     reviewTable () {
       console.log('review_table request', {
         method: 'get',
-        url: 'http://localhost:8081/api/review_table',
+        url: 'http://124.70.178.153:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
       this.resetOperations()
       axios({
         method: 'get',
-        url: 'http://localhost:8081/api/review_table',
+        url: 'http://124.70.178.153:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
         .then((res) => {
@@ -395,7 +395,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/add_book',
+        url: 'http://124.70.178.153:8081/api/add_book',
         data: {
           book_time: this.getValidDateTime(),
           table_id_list: this.operations.book
@@ -428,7 +428,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/cancel_book',
+        url: 'http://124.70.178.153:8081/api/cancel_book',
         data: { book_serial: this.bookSerial }
       })
         .then((res) => {
@@ -454,7 +454,7 @@ export default {
       }
       console.log('open_table request', {
         method: 'post',
-        url: 'http://localhost:8081/api/open_table',
+        url: 'http://124.70.178.153:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -462,7 +462,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/open_table',
+        url: 'http://124.70.178.153:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -518,7 +518,7 @@ export default {
       }
       console.log('merge_table request', {
         method: 'post',
-        url: 'http://localhost:8081/api/merge_table',
+        url: 'http://124.70.178.153:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -526,7 +526,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/merge_table',
+        url: 'http://124.70.178.153:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -548,7 +548,7 @@ export default {
     finish () {
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/finish_table',
+        url: 'http://124.70.178.153:8081/api/finish_table',
         data: { table_id: this.operations.finish[0] }
       })
         .then((res) => {
