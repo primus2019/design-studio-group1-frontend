@@ -47,17 +47,16 @@
               <b-button
                 @click="$bvModal.show('takeoutInfoForm')"
                 variant="outline-primary"
-                style="width:50%;height:7vh;"
                 size="md"
               >
                 <!-- <p style="font-size: 4vw; display: inline;">配送信息</p> -->
-                配送
+                配送信息
               </b-button>
               <b-button
                 size="md"
-                style="width:50%;height:7vh;"
                 @click="addTakeout"
                 variant="primary"
+                style="margin-right:2px"
               >
                 {{ orderSet ? '改单' : '下单' }}
               </b-button>
