@@ -7,6 +7,65 @@
         </b-col>
       </b-row>
       <b-row>
+        <b-col xl="4" lg="4" md="4" sm="4" cols="4">
+          <b-row align-h="left" align-v="center">
+            <label>小桌: {{ this.queue[0] }}</label>
+            <b-button-group>
+              <b-button
+                variant="primary"
+                @click="pushQueue(0)"
+              >
+                取号
+              </b-button>
+              <b-button
+                variant="outline-primary"
+                @click="popQueue(0)"
+              >
+                下一桌
+              </b-button>
+            </b-button-group>
+          </b-row>
+        </b-col>
+        <b-col xl="4" lg="4" md="4" sm="4" cols="4">
+          <b-row align-h="center" align-v="center">
+            <label>中桌: {{ this.queue[1] }}</label>
+            <b-button-group>
+              <b-button
+                variant="primary"
+                @click="pushQueue(1)"
+              >
+                取号
+              </b-button>
+              <b-button
+                variant="outline-primary"
+                @click="popQueue(1)"
+              >
+                下一桌
+              </b-button>
+            </b-button-group>
+          </b-row>
+        </b-col>
+        <b-col xl="4" lg="4" md="4" sm="4" cols="4">
+          <b-row align-h="right" align-v="center">
+            <label>大桌: {{ this.queue[2] }}</label>
+            <b-button-group>
+              <b-button
+                variant="primary"
+                @click="pushQueue(2)"
+              >
+                取号
+              </b-button>
+              <b-button
+                variant="outline-primary"
+                @click="popQueue(2)"
+              >
+                下一桌
+              </b-button>
+            </b-button-group>
+          </b-row>
+        </b-col>
+      </b-row>
+      <b-row>
         <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-date"
@@ -193,7 +252,8 @@ export default {
       promptInputType: null,
       promptInputText: null,
       bookSerial: null,
-      isCurrent: true
+      isCurrent: true,
+      queue: [-1, -1, -1]
     }
   },
   computed: {
@@ -344,13 +404,13 @@ export default {
     reviewTable () {
       console.log('review_table request', {
         method: 'get',
-        url: 'http://localhost:8081/api/review_table',
+        url: 'http://124.70.178.153:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
       this.resetOperations()
       axios({
         method: 'get',
-        url: 'http://localhost:8081/api/review_table',
+        url: 'http://124.70.178.153:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
         .then((res) => {
@@ -395,7 +455,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/add_book',
+        url: 'http://124.70.178.153:8081/api/add_book',
         data: {
           book_time: this.getValidDateTime(),
           table_id_list: this.operations.book
@@ -428,7 +488,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/cancel_book',
+        url: 'http://124.70.178.153:8081/api/cancel_book',
         data: { book_serial: this.bookSerial }
       })
         .then((res) => {
@@ -454,7 +514,7 @@ export default {
       }
       console.log('open_table request', {
         method: 'post',
-        url: 'http://localhost:8081/api/open_table',
+        url: 'http://124.70.178.153:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -462,7 +522,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/open_table',
+        url: 'http://124.70.178.153:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -518,7 +578,7 @@ export default {
       }
       console.log('merge_table request', {
         method: 'post',
-        url: 'http://localhost:8081/api/merge_table',
+        url: 'http://124.70.178.153:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -526,7 +586,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/merge_table',
+        url: 'http://124.70.178.153:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -548,7 +608,7 @@ export default {
     finish () {
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/finish_table',
+        url: 'http://124.70.178.153:8081/api/finish_table',
         data: { table_id: this.operations.finish[0] }
       })
         .then((res) => {
@@ -563,6 +623,30 @@ export default {
             default:
               this.prompt('bug: unexpected finish_status in /api/finish_table: response')
           }
+        })
+        .catch((err) => console.log(err))
+    },
+    // /api/add_queue: request/response
+    pushQueue (size) {
+      axios({
+        method: 'post',
+        url: 'http://124.70.178.153:8081/api/add_queue',
+        data: { table_type: size }
+      })
+        .then((res) => {
+          this.prompt('新的排队号：', res.data.id)
+        })
+        .catch((err) => console.log(err))
+    },
+    // /api/remove_queue
+    popQueue (size) {
+      axios({
+        method: 'post',
+        url: 'http://124.70.178.153:8081/api/remove_queue',
+        data: { table_type: size }
+      })
+        .then((res) => {
+          this.queue[size] = res.data.id
         })
         .catch((err) => console.log(err))
     }
