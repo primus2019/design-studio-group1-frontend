@@ -69,27 +69,25 @@
                 </b-row>
               </b-col>
               <b-col xl="8" lg="8" md="8" sm="8" cols="8">
-                <b-row align-h="end" style="margin:0;" align-v="center">
+                <b-row align-h="end" style="margin:0;margin-bottom:8px;margin-right:8px" align-v="center">
                   <b-button
-                    style="width:5.5vmin;height:5.5vmin;border-radius:5.5vmin;padding:0 0.5vmin;"
+                    class="add-remove-button"
                     variant="outline-primary"
-                    class=""
                     @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
                     :disabled="dish.orderCount === 0 || !dish.selectable"
                     v-if="!orderSet"
                   >
-                    <b-icon style="width:4vmin;" icon="dash"/>
+                    <b-icon scale="0.8" class="add-remove-icon" icon="dash"/>
                   </b-button>
-                  <label style="text-align:center;vertical-align:bottom;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
+                  <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
                   <b-button
-                    style="width:5.5vmin;height:5.5vmin;border-radius:5.5vmin;padding:0 0.5vmin;"
                     variant="primary"
-                    class=""
+                    class="add-remove-button"
                     @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
                     :disabled="!dish.selectable"
                     v-if="!orderSet"
                   >
-                    <b-icon style="width:4vmin;" icon="plus"/>
+                    <b-icon scale="0.8" class="add-remove-icon" icon="plus"/>
                   </b-button>
                   <b-button
                     v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
@@ -185,5 +183,21 @@ export default {
   color: #ff4f36;
   font-weight: 600;
   font-size: 16pt;
+}
+
+.add-remove-button{
+  width:18px;
+  height:18px;
+  border-radius:18px;
+  padding:0;
+  position:relative;
+}
+
+.add-remove-icon{
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:16px;
+  height:16px;
 }
 </style>
