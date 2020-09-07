@@ -14,12 +14,12 @@
           <b-row class="ml-1">
             <label class="dish-name-label">{{ dish.name }}</label>
           </b-row>
-          <b-row align-h="between" align-v="center">
-            <b-col xl="6" lg="6" md="6" sm="6" cols="6">
+          <b-row align-v="center">
+            <b-col xl="5" lg="5" md="5" sm="5" cols="5">
               <p class="dish-price-label"><span class="yuan-symbol">￥</span>{{ dish.orderCount * dish.price }}</p>
             </b-col>
             <b-col xl="6" lg="6" md="6" sm="6" cols="6">
-              <b-row align-h="end" align-v="center" style="margin-bottom:8px;margin-right:8px;">
+              <b-row align-h="end" align-v="center" style="margin-bottom:8px;">
                 <b-button
                   variant="outline-primary"
                   class="h5"
