@@ -22,6 +22,11 @@ const routes = [
     path: '/Takeout',
     name: 'Takeout',
     component: () => import(/* webpackChunkName: "Book" */ '../views/Takeout.vue')
+  },
+  {
+    path: '/Queue',
+    name: 'Queue',
+    component: () => import(/* webpackChunkName: "Book" */ '../views/Queue.vue')
   }
 ]
 
