@@ -86,3 +86,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.prompt-input-group{
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+</style>
