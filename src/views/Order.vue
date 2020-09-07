@@ -79,7 +79,6 @@
     <b-modal
       id="orderTableIdModal"
       centered
-      title="桌号"
       ok-only
       hide-header-close
       no-close-on-backdrop
@@ -90,7 +89,7 @@
         prompt('请输入桌号');"
     >
       <b-form>
-        <label for="orderTableIdInput">您的桌号</label>
+        <label class="table-id-label" for="orderTableIdInput">您的桌号</label>
         <b-form-input
           id="orderTableIdInput"
           v-model="tableId"
@@ -364,12 +363,11 @@ export default {
 }
 </script>
 
-<style>
-label {
-  font-size: 4vmin;
-  font-weight: 700;
-  display: inline;
+<style scoped>
+.table-id-label{
+  font-size: 18pt;
 }
+
 h6 {
   font-size: 2.0vmin;
   vertical-align: middle;

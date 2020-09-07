@@ -132,7 +132,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .table-list {
   overflow-y: auto;
   overflow-x: hidden;

@@ -386,7 +386,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 label {
   font-size: 4vmin;
   font-weight: 700;

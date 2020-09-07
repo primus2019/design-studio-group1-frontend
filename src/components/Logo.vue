@@ -21,7 +21,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #logo {
   position: absolute;
   /* width: 315px; */

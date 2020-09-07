@@ -12,7 +12,7 @@
         class="dish-card"
         no-body
       >
-        <b-row no-gutters>
+        <b-row no-gutters align-v="center">
           <b-col xl="5" lg="5" md="5" sm="5" cols="5">
             <b-img
               :src="'data:image/png;base64,'+dish.picture"
@@ -60,12 +60,12 @@
               </b-col>
             </b-row> -->
             <b-row align-h="start" align-v="start" style="margin:0;height:50%;">
-              <label>{{ dish.name }}</label>
+              <label class="dish-name-label">{{ dish.name }}</label>
             </b-row>
             <b-row align-h="between" align-v="end" style="height:50%;">
               <b-col xl="4" lg="4" md="4" sm="4" cols="4">
                 <b-row align-h="start" style="margin:0;">
-                  <label>￥{{ dish.price }}</label>
+                  <label class="dish-price-label"><span class="yuan-symbol">￥</span>{{ dish.price }}</label>
                 </b-row>
               </b-col>
               <b-col xl="8" lg="8" md="8" sm="8" cols="8">
@@ -154,7 +154,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #dish {
   overflow-x: hidden;
   overflow-y: auto;
@@ -168,5 +168,22 @@ export default {
   #dishWidth {
     min-width: 50%;
   }
+}
+
+.dish-name-label{
+ padding: 5pt;
+ font-size: 16pt;
+ font-weight: 600;
+}
+
+.yuan-symbol{
+  font-size: 12pt;
+  margin-left: 3pt;
+}
+
+.dish-price-label{
+  color: #ff4f36;
+  font-weight: 600;
+  font-size: 16pt;
 }
 </style>
