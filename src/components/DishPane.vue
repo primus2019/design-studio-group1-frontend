@@ -69,7 +69,7 @@
                 </b-row>
               </b-col>
               <b-col xl="8" lg="8" md="8" sm="8" cols="8">
-                <b-row align-h="end" style="margin:0;margin-bottom:8px;margin-right:8px" align-v="center">
+                <b-row align-h="end" style="margin:0;margin-bottom:8px;margin-right:12px;padding-bottom:2px" align-v="center">
                   <b-button
                     class="add-remove-button"
                     variant="outline-primary"
