@@ -8,7 +8,7 @@
       </b-row>
       <b-row>
         <b-col xl="4" lg="4" md="4" sm="4" cols="4">
-          <b-row align-h="left" align-v="center">
+          <b-row align-h="start" align-v="center">
             <label>小桌: {{ this.queue[0] }}</label>
             <b-button-group>
               <b-button
@@ -46,7 +46,7 @@
           </b-row>
         </b-col>
         <b-col xl="4" lg="4" md="4" sm="4" cols="4">
-          <b-row align-h="right" align-v="center">
+          <b-row align-h="end" align-v="center">
             <label>大桌: {{ this.queue[2] }}</label>
             <b-button-group>
               <b-button
@@ -75,7 +75,7 @@
             :inputMin="minBookingDate"
             :inputMax="maxBookingDate"
             state="false"
-            placeholder="Select booking date"
+            placeholder="选择预定日期"
             inputLiveFeedback="Must select booking date"
             @input="handleBookingDateInput"
             :reset="inputGroupBookingDateReset"
@@ -88,7 +88,7 @@
             inputId="booking-time-input"
             inputType="time"
             :state="validateTime"
-            placeholder="Select booking time"
+            placeholder="选择预定时间"
             inputLiveFeedback="Must select booking time"
             @input="handleBookingTimeInput"
             :reset="inputGroupBookingTimeReset"
@@ -105,7 +105,7 @@
             :inputMin="minBookingGuestNumber"
             :inputMax="maxBookingGuestNumber"
             :state="false"
-            placeholder="Select guest number"
+            placeholder="选择顾客数量"
             inputLiveFeedback="Must select guest number"
             @input="handleBookingGuestNumberInput"
             :reset="inputGroupBookingGuestNumberReset"
@@ -404,13 +404,13 @@ export default {
     reviewTable () {
       console.log('review_table request', {
         method: 'get',
-        url: 'http://localhost:8081/api/review_table',
+        url: 'http://124.70.178.153:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
       this.resetOperations()
       axios({
         method: 'get',
-        url: 'http://localhost:8081/api/review_table',
+        url: 'http://124.70.178.153:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
         .then((res) => {
@@ -455,7 +455,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/add_book',
+        url: 'http://124.70.178.153:8081/api/add_book',
         data: {
           book_time: this.getValidDateTime(),
           table_id_list: this.operations.book
@@ -488,7 +488,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/cancel_book',
+        url: 'http://124.70.178.153:8081/api/cancel_book',
         data: { book_serial: this.bookSerial }
       })
         .then((res) => {
@@ -514,7 +514,7 @@ export default {
       }
       console.log('open_table request', {
         method: 'post',
-        url: 'http://localhost:8081/api/open_table',
+        url: 'http://124.70.178.153:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -522,7 +522,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/open_table',
+        url: 'http://124.70.178.153:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -578,7 +578,7 @@ export default {
       }
       console.log('merge_table request', {
         method: 'post',
-        url: 'http://localhost:8081/api/merge_table',
+        url: 'http://124.70.178.153:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -586,7 +586,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/merge_table',
+        url: 'http://124.70.178.153:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -608,7 +608,7 @@ export default {
     finish () {
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/finish_table',
+        url: 'http://124.70.178.153:8081/api/finish_table',
         data: { table_id: this.operations.finish[0] }
       })
         .then((res) => {
