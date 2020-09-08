@@ -3,19 +3,17 @@
     <div id="menu-heading-list">
       <b-list-group
         v-b-scrollspy:dish=390
-        flush
       >
         <div
           v-for="item in dishTypes"
           :key="item.type"
         >
           <b-list-group-item
-            class="d-flex justify-content-between align-items-center"
+            class="d-flex justify-content-between align-items-center dish-type-list-border"
             :href="'#dish-card-'+item.type"
-            style="min-height:10vh;padding-left:2vw;padding-right:2vw;padding-top:0;padding-bottom:0;"
           >
-                <label style="font-size:3.5vw;display:inline;">{{ item.typeName }}</label>
-                <b-badge style="font-size:2.5vw;" variant="light">{{ item.orderCount }}</b-badge>
+                <label style="font-size:12pt;font-weight:600;margin-bottom:0;">{{ item.typeName }}</label>
+                <b-badge style="font-size:8pt;" variant="light" v-if="showBadge">{{ item.orderCount }}</b-badge>
           </b-list-group-item>
         </div>
       </b-list-group>
@@ -26,6 +24,16 @@
 <script>
 export default {
   name: 'MenuHeading',
+  data: function () {
+    return {
+      showBadge: window.innerWidth >= 768
+    }
+  },
+  mounted () {
+    window.addEventListener('resize', () => {
+      this.showBadge = window.innerWidth >= 768
+    })
+  },
   props: {
     dishes: {
       type: Array,
@@ -59,7 +67,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #menu-title {
   /* position: absolute;
   width: 62px;
@@ -85,5 +93,10 @@ export default {
   height: 379px;
   left: 38px;
   top: 139px; */
+}
+
+.dish-type-list-border{
+  border-color: white !important;
+  padding: 0.75rem !important;
 }
 </style>

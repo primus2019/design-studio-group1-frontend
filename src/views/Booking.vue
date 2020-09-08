@@ -1,9 +1,9 @@
 <template>
   <div class="Booking">
     <b-container :fluid="bookingFluid">
-      <b-row class="bg-light" align-v="center" align-h="start" style="height:5vh;">
+      <b-row class="bg-light" align-v="center" align-h="start" style="height:50px;">
         <b-col>
-          <b-img src="../assets/booking.png" style="height:5vh;"/>
+          <b-img src="../assets/booking.png" style="height:50px;"/>
         </b-col>
       </b-row>
       <b-row>
@@ -69,7 +69,7 @@
         <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-date"
-            prompt="Booking Date:"
+            prompt="预约日期"
             inputId="booking-date-input"
             inputType="date"
             :inputMin="minBookingDate"
@@ -84,7 +84,7 @@
         <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-time"
-            prompt="Booking Time:"
+            prompt="预约时间"
             inputId="booking-time-input"
             inputType="time"
             :state="validateTime"
@@ -99,7 +99,7 @@
         <b-col xl="6" lg="6" md="6" sm="6" cols="6">
           <PromptInputGroup
             id="input-group-booking-guest-number"
-            prompt="Guest Number:"
+            prompt="顾客数量"
             inputId="booking-guest-number-input"
             inputType="number"
             :inputMin="minBookingGuestNumber"
@@ -118,14 +118,14 @@
         </b-col>
         <b-col xl="5" lg="5" md="5" sm="5" cols="5" style="vertical-align:bottom;">
           <b-row align-h="center" align-v="end" class="ml-auto" style="height:100%;">
-            <input
-              type="checkbox"
+            <b-form-checkbox
               v-model="showBookedTables"
               :autocomplete="false"
-              style="height:50%;width:2.5vmin;"
-              class="mr-1 mb-1"
-            />
-            <p style="font-size:2.5vmin;margin:0;height:50%;">显示已预约</p>
+              class="show-booked-checkbox"
+              size="lg"
+            >
+            显示已预约
+            </b-form-checkbox>
             <!-- <CheckboxInputGroup
               id="checkbox-input-show-unavailable-tables"
               prompt="显示不可用桌"
@@ -404,13 +404,13 @@ export default {
     reviewTable () {
       console.log('review_table request', {
         method: 'get',
-        url: 'http://124.70.178.153:8081/api/review_table',
+        url: 'http://localhost:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
       this.resetOperations()
       axios({
         method: 'get',
-        url: 'http://124.70.178.153:8081/api/review_table',
+        url: 'http://localhost:8081/api/review_table',
         params: { book_time: this.getValidDateTime() }
       })
         .then((res) => {
@@ -455,7 +455,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/add_book',
+        url: 'http://localhost:8081/api/add_book',
         data: {
           book_time: this.getValidDateTime(),
           table_id_list: this.operations.book
@@ -488,7 +488,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/cancel_book',
+        url: 'http://localhost:8081/api/cancel_book',
         data: { book_serial: this.bookSerial }
       })
         .then((res) => {
@@ -514,7 +514,7 @@ export default {
       }
       console.log('open_table request', {
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/open_table',
+        url: 'http://localhost:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -522,7 +522,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/open_table',
+        url: 'http://localhost:8081/api/open_table',
         data: {
           table_id_list: book ? null : this.operations.open,
           book_serial: book ? this.bookSerial : null
@@ -578,7 +578,7 @@ export default {
       }
       console.log('merge_table request', {
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/merge_table',
+        url: 'http://localhost:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -586,7 +586,7 @@ export default {
       })
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/merge_table',
+        url: 'http://localhost:8081/api/merge_table',
         data: {
           main_table_id: tmpMainTable,
           table_id_list: this.operations.merge
@@ -608,7 +608,7 @@ export default {
     finish () {
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/finish_table',
+        url: 'http://localhost:8081/api/finish_table',
         data: { table_id: this.operations.finish[0] }
       })
         .then((res) => {
@@ -657,3 +657,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.show-booked-checkbox{
+  margin-bottom: 15px;
+}
+
+.Booking{
+  margin-bottom: 15px;
+}
+</style>

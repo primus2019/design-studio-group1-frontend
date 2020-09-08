@@ -5,6 +5,7 @@
       variant="outline-dark"
       size="lg"
       @click="search"
+      class="search-table-button"
     >
       Search
     </b-button>
@@ -21,3 +22,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.search-table-button{
+  margin-bottom:8px;
+}
+</style>

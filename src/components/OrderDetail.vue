@@ -5,21 +5,21 @@
     scrollable
     ok-only
     button-size="md"
-    title="Your orders"
+    title="已选菜品"
   >
-    <div v-if="emptyDish">No order</div>
+    <div v-if="emptyDish">没有已选菜品</div>
     <b-list-group>
       <div v-for="dish in dishes" :key="dish.dish_id">
         <b-list-group-item  v-if="dish.orderCount !== 0">
           <b-row class="ml-1">
-            <label>{{ dish.name }}</label>
+            <label class="dish-name-label">{{ dish.name }}</label>
           </b-row>
-          <b-row align-h="between" align-v="center">
-            <b-col xl="6" lg="6" md="6" sm="6" cols="6">
-              <p>￥{{ dish.orderCount * dish.price }}</p>
+          <b-row align-v="center">
+            <b-col xl="5" lg="5" md="5" sm="5" cols="5">
+              <p class="dish-price-label"><span class="yuan-symbol">￥</span>{{ dish.orderCount * dish.price }}</p>
             </b-col>
             <b-col xl="6" lg="6" md="6" sm="6" cols="6">
-              <b-row align-h="end" align-v="center">
+              <b-row align-h="end" align-v="center" style="margin-bottom:8px;">
                 <b-button
                   variant="outline-primary"
                   class="h5"
@@ -28,7 +28,7 @@
                 >
                   <b-icon icon="dash"/>
                 </b-button>
-                <p class="ml-2 mr-2">{{ dish.orderCount }}</p>
+                <p class="ml-3 mr-3" style="text-align:center;margin-bottom:8px;font-size:16pt;">{{ dish.orderCount }}</p>
                 <b-button
                   variant="primary"
                   class="h5"
@@ -96,3 +96,22 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.dish-name-label{
+ padding: 5pt;
+ font-size: 16pt;
+ font-weight: 600;
+}
+
+.yuan-symbol{
+  font-size: 12pt;
+  margin-left: 3pt;
+}
+
+.dish-price-label{
+  color: #ff4f36;
+  font-weight: 600;
+  font-size: 16pt;
+}
+</style>

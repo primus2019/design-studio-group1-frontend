@@ -79,7 +79,6 @@
     <b-modal
       id="orderTableIdModal"
       centered
-      title="桌号"
       ok-only
       hide-header-close
       no-close-on-backdrop
@@ -90,7 +89,7 @@
         prompt('请输入桌号');"
     >
       <b-form>
-        <label for="orderTableIdInput">您的桌号</label>
+        <label class="table-id-label" for="orderTableIdInput">您的桌号</label>
         <b-form-input
           id="orderTableIdInput"
           v-model="tableId"
@@ -176,12 +175,12 @@ export default {
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
       console.log('dish_residue request', {
         method: 'get',
-        url: 'http://124.70.178.153:8081/api/dish_residue',
+        url: 'http://localhost:8081/api/dish_residue',
         params: { dishes: newOrder }
       })
       axios({
         method: 'get',
-        url: 'http://124.70.178.153:8081/api/dish_residue',
+        url: 'http://localhost:8081/api/dish_residue',
         params: { dishes: newOrder }
       })
         .then((res) => {
@@ -224,12 +223,12 @@ export default {
         .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
       console.log('add_order request', {
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/add_order',
+        url: 'http://localhost:8081/api/add_order',
         data: { table_id: this.tableId, dishes: newOrder }
       })
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/add_order',
+        url: 'http://localhost:8081/api/add_order',
         data: { table_id: this.tableId, dishes: newOrder }
       })
         .then((res) => {
@@ -248,7 +247,7 @@ export default {
     removeOrder (dishId) {
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/remove_order',
+        url: 'http://localhost:8081/api/remove_order',
         data: {
           table_id: this.tableId,
           dishes: { dish_id: dishId, count: 1 }
@@ -273,7 +272,7 @@ export default {
     nudge (dishId) {
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/nudge',
+        url: 'http://localhost:8081/api/nudge',
         data: { table_id: this.tableId }
       })
         .catch((err) => console.log(err))
@@ -315,13 +314,13 @@ export default {
       this.paymentMethod = method
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/pay_table',
+        url: 'http://localhost:8081/api/pay_table',
         data: { table_id: this.tableId }
       })
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/g3/discount_payment',
+        url: 'http://localhost:8081/g3/discount_payment',
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
@@ -334,7 +333,7 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/g3/confirm_payment',
+        url: 'http://localhost:8081/g3/confirm_payment',
         data: {
           payment_method: this.paymentMethod
         }
@@ -352,7 +351,7 @@ export default {
   },
   // /api/dish: request/response
   mounted () {
-    const path = 'http://124.70.178.153:8081/api/dish'
+    const path = 'http://localhost:8081/api/dish'
     axios({
       method: 'get',
       url: path
@@ -364,12 +363,11 @@ export default {
 }
 </script>
 
-<style>
-label {
-  font-size: 4vmin;
-  font-weight: 700;
-  display: inline;
+<style scoped>
+.table-id-label{
+  font-size: 18pt;
 }
+
 h6 {
   font-size: 2.0vmin;
   vertical-align: middle;
