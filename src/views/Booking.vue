@@ -162,11 +162,11 @@
               <b-button @click="resetOperations" variant="outline-info">
                 清空
               </b-button>
-              <b-button @click="open(false)" variant="outline-success">
-                开台
-              </b-button>
-              <b-button @click="merge" variant="outline-primary">
+              <b-button @click="merge" variant="outline-success" :disabled="operations.merge.length === 0">
                 并台
+              </b-button>
+              <b-button @click="open(false)" variant="outline-primary" :disabled="operations.open.length === 0">
+                开台
               </b-button>
             </b-button-group>
           </b-row>
@@ -242,7 +242,11 @@ export default {
       promptInputText: null,
       bookSerial: null,
       isCurrent: true,
-      queue: [-1, -1, -1]
+      queue: {
+        0: '无',
+        1: '无',
+        2: '无'
+      }
     }
   },
   computed: {
@@ -624,6 +628,9 @@ export default {
       })
         .then((res) => {
           this.prompt('新的排队号：' + res.data.id)
+          if (this.queue[size] === '无') {
+            this.queue[size] = res.data.id
+          }
         })
         .catch((err) => console.log(err))
     },
@@ -635,7 +642,7 @@ export default {
         data: { table_type: size }
       })
         .then((res) => {
-          this.queue[size] = res.data.id
+          this.queue[size] = res.data.id === -1 ? '无' : res.data.id
         })
         .catch((err) => console.log(err))
     }
