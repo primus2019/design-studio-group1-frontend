@@ -11,7 +11,7 @@
           <label :for="promptInputId">{{ this.promptInputText }}</label>
           <b-form-input
             :id="promptInputId"
-            placeholder="Enter book serial"
+            placeholder="输入预定号"
             :type="promptInputType"
             v-model="promptInputModel"
             required
