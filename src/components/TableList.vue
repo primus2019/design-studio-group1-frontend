@@ -11,7 +11,7 @@
       head-variant="light"
       table-variant="light"
       hover
-      sticky-header="80vh"
+      sticky-header="70vh"
       style="overflow-x:hidden;"
     >
       <template v-slot:head(table_id)>
@@ -33,8 +33,8 @@
               size="sm"
               class="table-list-operation-button"
               variant="outline-success"
-              v-if="singleTable.item.book_status === 1"
-              @click="updateOperation('book', singleTable.item.table_id)"
+              v-if="singleTable.item.book_status === 1 && !isCurrent"
+              @click="$emit('book', singleTable.item.table_id)"
             >
               预定
             </b-button>
@@ -51,7 +51,7 @@
               size="sm"
               class="table-list-operation-button"
               variant="outline-info"
-              @click="updateOperation('finish', singleTable.item.table_id)"
+              @click="$emit('finish', singleTable.item.table_id)"
               v-if="isCurrent && singleTable.item.book_status === 0"
             >
               关台
