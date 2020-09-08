@@ -2,7 +2,7 @@
   <div class="table-list">
     <b-table
       class="table-table"
-      :items="tableList"
+      :items="localTableList"
       :fields="tableFields"
       :filter="filterTrigger"
       :filter-function="tableListFilter"
@@ -14,6 +14,18 @@
       sticky-header="80vh"
       style="overflow-x:hidden;"
     >
+      <template v-slot:head(table_id)>
+        桌号
+      </template>
+      <template v-slot:head(table_content)>
+        最大容量
+      </template>
+      <template v-slot:head(book_status)>
+        预定状态
+      </template>
+      <template v-slot:head(operations)>
+        操作
+      </template>
       <template v-slot:cell(operations)="singleTable">
         <b-row align-h="start">
           <b-button-group>
@@ -69,7 +81,23 @@ export default {
   name: 'TableList',
   props: {
     tableList: {
-      type: Array
+      type: Array,
+      default: () => [
+        { table_id: 0, table_content: 2, book_status: 0 },
+        { table_id: 1, table_content: 2, book_status: 0 },
+        { table_id: 2, table_content: 2, book_status: 0 },
+        { table_id: 3, table_content: 2, book_status: 0 },
+        { table_id: 4, table_content: 2, book_status: 0 },
+        { table_id: 5, table_content: 2, book_status: 0 },
+        { table_id: 6, table_content: 2, book_status: 0 },
+        { table_id: 7, table_content: 2, book_status: 0 },
+        { table_id: 8, table_content: 2, book_status: 0 },
+        { table_id: 9, table_content: 2, book_status: 0 },
+        { table_id: 10, table_content: 2, book_status: 0 },
+        { table_id: 11, table_content: 2, book_status: 0 },
+        { table_id: 12, table_content: 2, book_status: 0 },
+        { table_id: 13, table_content: 2, book_status: 0 }
+      ]
     },
     showBookedTables: {
       type: Boolean,
