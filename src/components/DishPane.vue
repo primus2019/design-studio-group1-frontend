@@ -36,7 +36,7 @@
                     <b-row align-h="end" style="margin:0;margin-bottom:8px;margin-right:12px;padding-bottom:2px" align-v="center">
                       <b-button
                         class="add-remove-button"
-                        variant="outline-primary"
+                        :variant="dish.selectable ? 'outline-primary' : 'outline-secondary'"
                         @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
                         :disabled="dish.orderCount === 0 || !dish.selectable"
                         v-if="!orderSet"
@@ -45,8 +45,8 @@
                       </b-button>
                       <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
                       <b-button
-                        variant="primary"
                         class="add-remove-button"
+                        :variant="dish.selectable ? 'primary' : 'secondary'"
                         @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
                         :disabled="!dish.selectable"
                         v-if="!orderSet"
@@ -91,7 +91,7 @@
                     <b-row align-h="end" style="margin:0;margin-bottom:8px;margin-right:12px;padding-bottom:2px" align-v="center">
                       <b-button
                         class="add-remove-button"
-                        variant="outline-primary"
+                        :variant="dishes[index + 1].selectable ? 'outline-primary' : 'outline-secondary'"
                         @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount - 1)"
                         :disabled="dishes[index + 1].orderCount === 0 || !dishes[index + 1].selectable"
                         v-if="!orderSet"
@@ -100,8 +100,8 @@
                       </b-button>
                       <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dishes[index + 1].orderCount }}</label>
                       <b-button
-                        variant="primary"
                         class="add-remove-button"
+                        :variant="dishes[index + 1].selectable ? 'primary' : 'secondary'"
                         @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount + 1)"
                         :disabled="!dishes[index + 1].selectable"
                         v-if="!orderSet"
