@@ -34,7 +34,7 @@
               class="table-list-operation-button"
               variant="outline-success"
               v-if="singleTable.item.book_status === 1 && !isCurrent"
-              @click="$emit('book', singleTable.item.table_id)"
+              @click="updateOperation('book', singleTable.item.table_id)"
             >
               预定
             </b-button>

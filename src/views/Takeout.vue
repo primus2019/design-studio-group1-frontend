@@ -204,7 +204,7 @@ export default {
         .then((res) => {
           console.log('add_order response.data', res.data)
           if (res.data.success === 1) {
-            this.prompt('Your orders are all set!')
+            this.prompt('下单成功!')
             this.orderSet = true
           } else {
             var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
@@ -253,7 +253,7 @@ export default {
         .then((res) => {
           console.log('parent add_takeout response.data', res.data)
           if (res.data.success === 1) {
-            this.prompt('Your takeouts are all set!')
+            this.prompt('下单成功!')
             this.orderSet = true
             this.takeoutId = res.data.takeout_id
             setTimeout(() => {

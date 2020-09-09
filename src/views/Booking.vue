@@ -122,15 +122,16 @@
             :showUnavailableTables="showUnavailableTables"
             :tableList="tables"
             :isCurrent="isCurrent"
-            @book="book"
             @finish="finish"
             @operation="handleOperation"
           ></TableList>
         </b-col>
       </b-row>
       <b-row class="bg-light" align-h="end" align-v="center">
-          选中开台：{{ this.operations.open.length === 0 ? "无" : this.operations.open }} |
-          选中并台：{{ this.operations.merge.length === 0 ? "无" : this.operations.merge }}
+        {{ this.isCurrent ? ('选中开台：' + (this.operations.open.length === 0 ? "无" : this.operations.open)
+          + ' | ' + '选中并台：' + (this.operations.merge.length === 0 ? "无" : this.operations.merge))
+          : ('选中预定：' + (this.operations.book.length === 0 ? "无" : this.operations.book))
+        }}
       </b-row>
       <b-row class="bg-light" align-h="end">
         <b-col xl="2" lg="2" md="2" sm="2" cols="2">
@@ -162,11 +163,14 @@
               <b-button @click="resetOperations" variant="outline-info">
                 清空
               </b-button>
-              <b-button @click="merge" variant="outline-success" :disabled="operations.merge.length === 0">
+              <b-button @click="merge" variant="outline-success" :disabled="operations.merge.length === 0" v-if="isCurrent">
                 并台
               </b-button>
-              <b-button @click="open(false)" variant="outline-primary" :disabled="operations.open.length === 0">
+              <b-button @click="open(false)" variant="outline-primary" :disabled="operations.open.length === 0" v-if="isCurrent">
                 开台
+              </b-button>
+              <b-button @click="book" variant="outline-info" :disabled="operations.book.length === 0" v-if="!isCurrent">
+                预定
               </b-button>
             </b-button-group>
           </b-row>
@@ -429,17 +433,17 @@ export default {
     //   }, 500)
     // },
     // /api/add_book: request/response
-    book (tableId) {
+    book () {
       console.log('add_book request', {
         book_time: this.getValidDateTime(),
-        table_id_list: tableId
+        table_id_list: this.operations.book
       })
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8081/api/add_book',
         data: {
           book_time: this.getValidDateTime(),
-          table_id_list: tableId
+          table_id_list: this.operations.book
         }
       })
         .then((res) => {
@@ -459,6 +463,7 @@ export default {
           }
         })
         .catch(err => console.log(err))
+      this.operations.book = []
       this.reviewTable()
     },
     // /api/cancel_book: request/response

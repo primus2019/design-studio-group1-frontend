@@ -43,33 +43,30 @@
         </b-col>
         <b-col xl="2" lg="2" md="3" sm="4" cols="5">
           <b-row align-h="end" align-v="end" class="">
-            <b-button
-              pill
-              size="md"
-              style="width:50%;height:7vh;"
-              v-if="orderSet"
-              @click="nudge"
-            >
-              催单
-            </b-button>
-            <b-button
-              pill
-              size="md"
-              style="width:50%;height:7vh;"
-              v-if="orderSet"
-              v-b-modal.billModalId
-            >
-              支付
-            </b-button>
-            <b-button
-              pill
-              size="md"
-              style="width:50%;height:7vh;"
-              @click="addOrder"
-              variant="primary"
-            >
-              {{ orderSet ? '改单' : '下单' }}
-            </b-button>
+            <b-button-group>
+              <b-button
+                size="md"
+                v-if="orderSet"
+                @click="nudge"
+              >
+                催单
+              </b-button>
+              <b-button
+                size="md"
+                v-if="orderSet"
+                v-b-modal.billModalId
+              >
+                支付
+              </b-button>
+              <b-button
+                size="md"
+                @click="addOrder"
+                variant="primary"
+                v-if="!orderSet"
+              >
+                下单
+              </b-button>
+            </b-button-group>
           </b-row>
         </b-col>
       </b-row>
@@ -83,6 +80,7 @@
       hide-header-close
       no-close-on-backdrop
       no-close-on-esc
+      hide-header
       @ok.prevent="
       ![null, ''].includes(tableId) ?
         $nextTick(() => $bvModal.hide('orderTableIdModal')) :
@@ -234,7 +232,7 @@ export default {
         .then((res) => {
           console.log('add_order response.data', res.data)
           if (res.data.success === 1) {
-            this.prompt('Your orders are all set!')
+            this.prompt('下单成功!')
             this.orderSet = true
           } else {
             var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
