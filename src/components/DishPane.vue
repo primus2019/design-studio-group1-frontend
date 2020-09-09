@@ -13,12 +13,14 @@
           <b-col xl="6" lg="6" md="6" sm="12" cols="12">
             <b-row no-gutters align-v="stretch" align-h="between">
               <b-col xl="5" lg="5" md="5" sm="5" cols="5">
-                <b-img
-                  :src="'data:image/png;base64,'+dish.picture"
-                  style="max-width:100%;height:auto;"
-                  :alt="dish.name"
-                  rounded
-                ></b-img>
+                <b-row align-h="start" align-v="center" style="margin: 0;">
+                  <b-img
+                    :src="'data:image/png;base64,'+dish.picture"
+                    style="max-width:100%;height:auto;"
+                    :alt="dish.name"
+                    rounded
+                  ></b-img>
+                </b-row>
               </b-col>
               <b-col xl="7" lg="7" md="7" sm="7" cols="7">
                 <b-row align-h="start" align-v="start" style="margin:0;height:50%;">
@@ -66,12 +68,14 @@
           <b-col xl="6" lg="6" md="6" sm="12" cols="12">
             <b-row no-gutters align-v="stretch" align-h="between">
               <b-col xl="5" lg="5" md="5" sm="5" cols="5">
-                <b-img
-                  :src="'data:image/png;base64,'+dishes[index + 1].picture"
-                  style="max-width:100%;height:auto;"
-                  :alt="dishes[index + 1].name"
-                  rounded
-                ></b-img>
+                <b-row align-h="start" align-v="center" style="margin: 0;">
+                  <b-img
+                    :src="'data:image/png;base64,'+dishes[index + 1].picture"
+                    style="max-width:100%;height:auto;"
+                    :alt="dishes[index + 1].name"
+                    rounded
+                  ></b-img>
+                </b-row>
               </b-col>
               <b-col xl="7" lg="7" md="7" sm="7" cols="7">
                 <b-row align-h="start" align-v="start" style="margin:0;height:50%;">
