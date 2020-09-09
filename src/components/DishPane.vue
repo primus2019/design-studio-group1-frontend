@@ -98,7 +98,7 @@
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="dash"/>
                       </b-button>
-                      <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
+                      <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dishes[index + 1].orderCount }}</label>
                       <b-button
                         variant="primary"
                         class="add-remove-button"

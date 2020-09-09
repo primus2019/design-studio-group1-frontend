@@ -126,17 +126,10 @@ export default {
       }
       return tmpSum.toString()
     },
-    extendDishesDict (tmpDish) {
-      for (var i = 0; i < this.dishes.length; i++) {
-        tmpDish.orderCount = i
-        tmpDish.price = 1
-        this.dishes[i] = tmpDish
-      }
-    },
     dishIndex (dishId) {
       for (var i = 0; i < this.dishes.length; i++) {
         if (this.dishes[i].dish_id === dishId) {
-          return this.dishes[i].dish_id
+          return i
         }
       }
       this.prompt('Fail to find dish id')
@@ -147,6 +140,7 @@ export default {
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
+      if (newOrder.length === 0) { return }
       console.log('dish_residue request', {
         method: 'get',
         url: 'http://124.70.178.153:8081/api/dish_residue',
@@ -159,31 +153,22 @@ export default {
       })
         .then((res) => {
           console.log('dish_residue response.data', res.data)
-          const soldOut = this.handleSoldout(res.data.dishes, dishId, newOrderCount)
-          if (soldOut) {
-            this.dishes.forEach((dish) => {
-              if (dish.dish_id === dishId) {
-                dish.orderCount = oldOrderCount
-              }
-            })
-          }
+          this.handleSoldOut(res.data.dishes)
         })
         .catch((err) => console.log(err))
     },
-    handleSoldout (dishes) {
-      for (const [dish, index] in dishes) {
-        var soldOutList = []
-        if (dish.sold_out === 1) {
-          this.dishes[index].orderCount = 0
-          this.dishes[index].selectable = false
-          this.soldOutList.push(dish.name)
-        }
-        if (soldOutList.length !== 0) {
-          this.prompt(soldOutList.join(','), 'has sold out!')
-          return true
+    handleSoldOut (dishes) {
+      var soldOutList = []
+      for (var i = 0; i < dishes.length; i++) {
+        if (dishes[i].sold_out === 1) {
+          this.dishes[this.dishIndex(dishes[i].dish_id)].orderCount = 0
+          this.dishes[this.dishIndex(dishes[i].dish_id)].selectable = false
+          soldOutList.push(dishes[i].name)
         }
       }
-      return false
+      if (soldOutList.length !== 0) {
+        this.prompt(soldOutList.join(','), '已售罄!')
+      }
     },
     // /api/add_order: request/response (order only for now)
     // it should use the table related api
@@ -282,7 +267,7 @@ export default {
         .then((res) => {
           if (res.data.success === 1) {
             this.prompt('菜品删除成功')
-            this.dishes[dishId].orderCount -= 1
+            this.dishes[this.dishIndex(dishId)].orderCount -= 1
           } else if (res.data.success === 0) {
             this.prompt('菜品删除失败')
           }
@@ -336,7 +321,7 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/g3/discount_payment',
+        url: 'http://124.70.178.153:8083/g3/discount_payment',
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
@@ -349,7 +334,7 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/g3/confirm_payment',
+        url: 'http://124.70.178.153:8083/g3/confirm_payment',
         data: {
           payment_method: this.paymentMethod,
           telephone: this.telephone
