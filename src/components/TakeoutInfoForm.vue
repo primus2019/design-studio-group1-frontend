@@ -31,7 +31,7 @@
           <b-form-input
             :id="id+'Name'"
             :ref="id+'Name'"
-            placeholder="Enter your name"
+            placeholder="请输入姓名"
             :state="checkValidity ? ![null, ''].includes(name) : null"
             aria-describedby="input-type-check-name"
             v-model="name"
@@ -46,7 +46,7 @@
           <b-form-input
             :id="id+'Phone'"
             :ref="id+'Phone'"
-            placeholder="Enter your phone"
+            placeholder="请输入手机"
             :state="checkValidity ? inputNumberCheck : null"
             aria-describedby="input-type-check-phone"
             v-model="phone"
@@ -61,7 +61,7 @@
           <b-form-input
             :id="id+'Address'"
             :ref="id+'Address'"
-            placeholder="Enter your address"
+            placeholder="请输入地址"
             :state="checkValidity ? ![null, ''].includes(address) : null"
             v-model="address"
             :disabled="disable || confirm"
@@ -143,7 +143,7 @@ export default {
           this.$bvModal.hide(this.id)
         })
       } else {
-        this.prompt('Invalid information')
+        this.prompt('请正确填写信息')
       }
     }
   },
