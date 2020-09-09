@@ -207,12 +207,12 @@ export default {
       console.log('add_order request', {
         method: 'post',
         url: 'http://124.70.178.153:8081/api/add_order',
-        data: { table_id: this.tableId, dishes: newOrder }
+        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId), dishes: newOrder }
       })
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8081/api/add_order',
-        data: { table_id: this.tableId, dishes: newOrder }
+        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId), dishes: newOrder }
       })
         .then((res) => {
           console.log('add_order response.data', res.data)
@@ -232,7 +232,7 @@ export default {
         method: 'post',
         url: 'http://124.70.178.153:8081/api/remove_order',
         data: {
-          table_id: this.tableId,
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
           dishes: { dish_id: dishId, count: 1 }
         }
       })
@@ -256,7 +256,7 @@ export default {
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8081/api/nudge',
-        data: { table_id: this.tableId }
+        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
       })
         .catch((err) => console.log(err))
       this.prompt('催单成功')
@@ -298,7 +298,7 @@ export default {
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8081/api/pay_table',
-        data: { table_id: this.tableId }
+        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
       })
         .catch((err) => console.log(err))
       axios({
@@ -307,7 +307,7 @@ export default {
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
-          table_id: this.tableId
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId)
         }
       })
         .then((res) => {
