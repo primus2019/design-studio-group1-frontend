@@ -104,7 +104,7 @@
               class="show-booked-checkbox"
               size="lg"
             >
-            显示已预约
+            显示不可选
             </b-form-checkbox>
             <!-- <CheckboxInputGroup
               id="checkbox-input-show-unavailable-tables"
@@ -377,13 +377,13 @@ export default {
         finish: []
       }
     },
-    firstBusyTable (tableIdList) {
+    firstMainTable (tableIdList) {
       for (var i = 0; i < tableIdList.length; i++) {
         for (var j = 0; j < this.tables.length; j++) {
           // if table_id is the same
           if (this.tables[j].table_id === tableIdList[i]) {
             // if table is busy
-            if (this.tables[j].book_status === 0) {
+            if (this.tables[j].main_table) {
               return tableIdList[i]
             } else {
               break
@@ -529,7 +529,7 @@ export default {
                 this.prompt('预定桌号被现场占用')
                 break
               case 4:
-                this.prompt('成功')
+                this.prompt('成功, 主桌号' + res.data.main_table_id)
                 break
               default:
                 this.prompt('bug: unexpected open_status in /api/open_table: ' + res.data.open_status)
@@ -558,7 +558,7 @@ export default {
     },
     // TODO: /api/merge_table: request/response
     merge () {
-      const tmpMainTable = this.firstBusyTable(this.operations.merge)
+      const tmpMainTable = this.firstMainTable(this.operations.merge)
       if (tmpMainTable === -1) {
         this.prompt('并台队列无合法主桌')
         return

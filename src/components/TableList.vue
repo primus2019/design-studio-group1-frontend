@@ -70,7 +70,7 @@
       </template>
       <template v-slot:cell(book_status)="singleTable">
         {{ bookStatusDict[singleTable.item.book_status] }}
-        <!-- {{ singleTable.item.book_status }} -->
+        {{ singleTable.item.main_table ? '(主桌)' : null }}
       </template>
     </b-table>
   </div>
