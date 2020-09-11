@@ -19,6 +19,7 @@
             :orderSet="orderSet"
             @change="changeOrderCount"
             @remove="removeOrder"
+            @add="addOrderAfterSet"
           ></DishPane>
         </b-col>
       </b-row>
@@ -235,7 +236,7 @@ export default {
         url: 'http://124.70.178.153:8081/api/add_order',
         data: {
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
-          dishes: { dish_id: dishId, count: 1 }
+          dishes: [{ dish_id: dishId, count: 1 }]
         }
       })
       axios({
@@ -243,7 +244,7 @@ export default {
         url: 'http://124.70.178.153:8081/api/add_order',
         data: {
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
-          dishes: { dish_id: dishId, count: 1 }
+          dishes: [{ dish_id: dishId, count: 1 }]
         }
       })
         .then((res) => {
@@ -251,7 +252,7 @@ export default {
           if (res.data.success === 1) {
             this.prompt('加菜成功!')
             // this.orderSet = true
-            this.dishes[this.dishIndex(this.tableId)].orderCount += 1
+            this.dishes[this.dishIndex(dishId)].orderCount += 1
           } else {
             var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
             this.prompt(soldOutList.join(','), '已售罄!')
@@ -266,7 +267,7 @@ export default {
         url: 'http://124.70.178.153:8081/api/remove_order',
         data: {
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
-          dishes: { dish_id: dishId, count: 1 }
+          dishes: [{ dish_id: dishId, count: 1 }]
         }
       })
       axios({
@@ -274,7 +275,7 @@ export default {
         url: 'http://124.70.178.153:8081/api/remove_order',
         data: {
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
-          dishes: { dish_id: dishId, count: 1 }
+          dishes: [{ dish_id: dishId, count: 1 }]
         }
       })
         .then((res) => {

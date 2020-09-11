@@ -264,10 +264,7 @@ export default {
         url: 'http://124.70.178.153:8081/api/remove_order',
         data: {
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
-          dishes: {
-            dish_id: dishId,
-            count: 1
-          }
+          dishes: [{ dish_id: dishId, count: 1 }]
         }
       })
         .then((res) => {
