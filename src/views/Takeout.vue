@@ -229,7 +229,7 @@ export default {
         data: {
           dishes: newOrder,
           name: this.name,
-          phone: this.phone,
+          telephone: this.phone,
           address: this.address
         }
       })
@@ -239,7 +239,7 @@ export default {
         data: {
           dishes: newOrder,
           name: this.name,
-          phone: this.phone,
+          telephone: this.phone,
           address: this.address
         }
       })

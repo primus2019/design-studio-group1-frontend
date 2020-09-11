@@ -135,7 +135,8 @@ export default {
       orderTableIdDisable: false,
       orderSet: false,
       paymentMethod: null,
-      discountPrice: null
+      discountPrice: null,
+      telephone: null
     }
   },
   methods: {
