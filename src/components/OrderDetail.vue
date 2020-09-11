@@ -35,6 +35,7 @@
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
                   v-if="!orderSet"
+                  :disabled="!dish.selectable"
                 >
                   <b-icon icon="plus"/>
                 </b-button>

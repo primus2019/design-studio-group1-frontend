@@ -38,7 +38,7 @@
                         class="add-remove-button"
                         :variant="dish.selectable ? 'outline-primary' : 'outline-secondary'"
                         @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                        :disabled="dish.orderCount === 0 || !dish.selectable"
+                        :disabled="dish.orderCount === 0"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="dash"/>
@@ -101,7 +101,7 @@
                         class="add-remove-button"
                         :variant="dishes[index + 1].selectable ? 'outline-primary' : 'outline-secondary'"
                         @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount - 1, dishes[index + 1].orderCount)"
-                        :disabled="dishes[index + 1].orderCount === 0 || !dishes[index + 1].selectable"
+                        :disabled="dishes[index + 1].orderCount === 0"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="dash"/>
