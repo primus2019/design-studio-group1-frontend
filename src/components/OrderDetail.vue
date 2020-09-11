@@ -24,7 +24,8 @@
                   variant="outline-primary"
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                  :disabled="dish.orderCount === 0 || orderSet"
+                  :disabled="dish.orderCount === 0"
+                  v-if="!orderSet"
                 >
                   <b-icon icon="dash"/>
                 </b-button>
@@ -33,9 +34,25 @@
                   variant="primary"
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
-                  :disabled="orderSet"
+                  v-if="!orderSet"
                 >
                   <b-icon icon="plus"/>
+                </b-button>
+                <b-button
+                  variant="outline-primary"
+                  class="h5"
+                  @click="$emit('add', dish.dish_id)"
+                  v-if="orderSet"
+                >
+                  加菜
+                </b-button>
+                <b-button
+                  variant="primary"
+                  class="h5"
+                  @click="$emit('remove', dish.dish_id)"
+                  v-if="orderSet"
+                >
+                  删菜
                 </b-button>
               </b-row>
             </b-col>

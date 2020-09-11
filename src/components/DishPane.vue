@@ -54,10 +54,18 @@
                         <b-icon scale="0.8" class="add-remove-icon" icon="plus"/>
                       </b-button>
                       <b-button
+                        variant="outline-info"
+                        v-if="orderSet && !isTakeout"
+                        @click="$emit('add', dish.dish_id)"
+                      >
+                        加菜
+                      </b-button>
+                      <b-button
+                        variant="outline-secondary"
                         v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
                         @click="$emit('remove', dish.dish_id)"
                       >
-                        remove
+                        删菜
                       </b-button>
                     </b-row>
                   </b-col>
@@ -92,7 +100,7 @@
                       <b-button
                         class="add-remove-button"
                         :variant="dishes[index + 1].selectable ? 'outline-primary' : 'outline-secondary'"
-                        @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount - 1)"
+                        @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount - 1, dishes[index + 1].orderCount)"
                         :disabled="dishes[index + 1].orderCount === 0 || !dishes[index + 1].selectable"
                         v-if="!orderSet"
                       >
@@ -102,17 +110,25 @@
                       <b-button
                         class="add-remove-button"
                         :variant="dishes[index + 1].selectable ? 'primary' : 'secondary'"
-                        @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount + 1)"
+                        @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount + 1, dishes[index + 1].orderCount)"
                         :disabled="!dishes[index + 1].selectable"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="plus"/>
                       </b-button>
                       <b-button
+                        variant="outline-info"
+                        v-if="orderSet && !isTakeout"
+                        @click="$emit('add', dishes[index + 1].dish_id)"
+                      >
+                        加菜
+                      </b-button>
+                      <b-button
+                        variant="outline-secondary"
                         v-if="dishes[index + 1].orderCount !== 0 && orderSet && !isTakeout"
                         @click="$emit('remove', dishes[index + 1].dish_id)"
                       >
-                        remove
+                        删菜
                       </b-button>
                     </b-row>
                   </b-col>

@@ -38,6 +38,8 @@
               :orderSet="orderSet"
               :dishes="dishes"
               @change="changeOrderCount"
+              @remove="removeOrder"
+              @add="addOrderAfterSet"
             ></OrderDetail>
           </b-row>
         </b-col>
@@ -124,12 +126,13 @@ export default {
       orderLogoDir: 'order.png',
       orderFluid: true,
       dishes: [],
-      takeoutId: -1,
+      takeoutId: null,
       promptText: null,
       tableId: null,
       orderTableIdDisable: false,
       orderSet: false,
-      paymentMethod: null
+      paymentMethod: null,
+      discountPrice: null
     }
   },
   methods: {
@@ -177,15 +180,15 @@ export default {
       })
         .then((res) => {
           console.log('dish_residue response.data', res.data)
-          this.handleSoldOut(res.data.dishes)
+          this.handleSoldOut(res.data.dishes, oldOrderCount)
         })
         .catch((err) => console.log(err))
     },
-    handleSoldOut (dishes) {
+    handleSoldOut (dishes, oldOrderCount) {
       var soldOutList = []
       for (var i = 0; i < dishes.length; i++) {
         if (dishes[i].sold_out === 1) {
-          this.dishes[this.dishIndex(dishes[i].dish_id)].orderCount = 0
+          this.dishes[this.dishIndex(dishes[i].dish_id)].orderCount = oldOrderCount
           this.dishes[this.dishIndex(dishes[i].dish_id)].selectable = false
           soldOutList.push(dishes[i].name)
         }
@@ -221,13 +224,51 @@ export default {
             this.orderSet = true
           } else {
             var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
-            this.prompt(soldOutList.join(','), 'has been sold out; your order fails!')
+            this.prompt(soldOutList.join(','), '已售罄!')
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    addOrderAfterSet (dishId) {
+      console.log('add_order(after set) request', {
+        method: 'post',
+        url: 'http://124.70.178.153:8081/api/add_order',
+        data: {
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          dishes: { dish_id: dishId, count: 1 }
+        }
+      })
+      axios({
+        method: 'post',
+        url: 'http://124.70.178.153:8081/api/add_order',
+        data: {
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          dishes: { dish_id: dishId, count: 1 }
+        }
+      })
+        .then((res) => {
+          console.log('add_order(after set) response.data', res.data)
+          if (res.data.success === 1) {
+            this.prompt('加菜成功!')
+            // this.orderSet = true
+            this.dishes[this.dishIndex(this.tableId)].orderCount += 1
+          } else {
+            var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
+            this.prompt(soldOutList.join(','), '已售罄!')
           }
         })
         .catch((err) => console.log(err))
     },
     // TODO: /api/remove_order: request/response
     removeOrder (dishId) {
+      console.log('remove_order request', {
+        method: 'post',
+        url: 'http://124.70.178.153:8081/api/remove_order',
+        data: {
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          dishes: { dish_id: dishId, count: 1 }
+        }
+      })
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8081/api/remove_order',
@@ -237,6 +278,7 @@ export default {
         }
       })
         .then((res) => {
+          console.log('remove_order response.data', res.data)
           switch (res.data.success) {
             case 0:
               this.prompt('菜品删除失败')
@@ -307,7 +349,8 @@ export default {
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
-          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId)
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          takeout_id: this.takeoutId
         }
       })
         .then((res) => {
@@ -318,18 +361,35 @@ export default {
         method: 'post',
         url: 'http://124.70.178.153:8083/g3/confirm_payment',
         data: {
-          payment_method: this.paymentMethod
+          payment_method: this.paymentMethod,
+          telephone: this.telephone,
+          discount_price: this.discountPrice,
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          takeout_id: this.takeoutId,
+          time: this.getValidDateTime
         }
       })
         .then((res) => {
           if (res.data.payment_status === 0) {
-            this.prompt('Your purchase is all set.')
+            this.prompt('支付成功')
           } else if (res.data.payment_status === 1) {
-            this.prompt('Your purchase fails; ask the servants for help.')
+            this.prompt('支付失败')
           } else {
             this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
           }
         })
+    },
+    getValidDateTime () {
+      var today = new Date()
+      today.setDate(today.getDate())
+      var dd = String(today.getDate()).padStart(2, '0')
+      var mm = String(today.getMonth() + 1).padStart(2, '0')
+      var yyyy = today.getFullYear()
+      var hh = String(today.getHours()).padStart(2, '0')
+      var MM = String(today.getMinutes()).padStart(2, '0')
+      var ss = String(today.getSeconds()).padStart(2, '0')
+
+      return yyyy + mm + dd + ' ' + hh + ':' + MM + ':' + ss
     }
   },
   // /api/dish: request/response
