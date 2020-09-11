@@ -17,6 +17,7 @@
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
+            :isTakeout="true"
             @change="changeOrderCount"
             @remove="removeOrder"
           ></DishPane>
@@ -37,6 +38,7 @@
               orderDetailModalId="orderDetailModalId"
               :orderSet="orderSet"
               :dishes="dishes"
+              :isTakeout="true"
               @change="changeOrderCount"
             ></OrderDetail>
           </b-row>
@@ -318,13 +320,13 @@ export default {
       this.paymentMethod = method
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/api/pay_table',
+        url: 'http://124.70.178.153:8081/pay_table',
         data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
       })
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8083/g3/discount_payment',
+        url: 'http://124.70.178.153:5000/discount_payment',
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
@@ -338,7 +340,7 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8083/g3/confirm_payment',
+        url: 'http://124.70.178.153:8083/confirm_payment',
         data: {
           payment_method: this.paymentMethod,
           telephone: this.telephone,
@@ -354,7 +356,7 @@ export default {
           } else if (res.data.payment_status === 1) {
             this.prompt('支付失败')
           } else {
-            this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
+            this.prompt('bug: unexpected payment_status in /confirm_status: ', res.data.payment_status)
           }
         })
     },

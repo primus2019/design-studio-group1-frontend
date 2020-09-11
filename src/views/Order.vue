@@ -17,6 +17,7 @@
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
+            :isTakeout="false"
             @change="changeOrderCount"
             @remove="removeOrder"
             @add="addOrderAfterSet"
@@ -38,6 +39,7 @@
               orderDetailModalId="orderDetailModalId"
               :orderSet="orderSet"
               :dishes="dishes"
+              :isTakeout="false"
               @change="changeOrderCount"
               @remove="removeOrder"
               @add="addOrderAfterSet"
@@ -346,7 +348,7 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8083/g3/discount_payment',
+        url: 'http://124.70.178.153:5000/discount_payment',
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
@@ -360,7 +362,7 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8083/g3/confirm_payment',
+        url: 'http://124.70.178.153:8083/confirm_payment',
         data: {
           payment_method: this.paymentMethod,
           telephone: this.telephone,

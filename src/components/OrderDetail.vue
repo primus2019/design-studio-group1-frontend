@@ -43,7 +43,7 @@
                   variant="outline-primary"
                   class="h5"
                   @click="$emit('add', dish.dish_id)"
-                  v-if="orderSet"
+                  v-if="orderSet && !isTakeout"
                 >
                   加菜
                 </b-button>
@@ -51,7 +51,7 @@
                   variant="primary"
                   class="h5"
                   @click="$emit('remove', dish.dish_id)"
-                  v-if="orderSet"
+                  v-if="orderSet && !isTakeout"
                 >
                   删菜
                 </b-button>
@@ -87,6 +87,9 @@ export default {
       default: 'orderDetailModalId'
     },
     orderSet: {
+      type: Boolean
+    },
+    isTakeout: {
       type: Boolean
     }
   },
