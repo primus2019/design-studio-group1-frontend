@@ -24,7 +24,7 @@
                   variant="outline-primary"
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                  :disabled="dish.orderCount === 0"
+                  :disabled="dish.orderCount === 0 || !dish.selectable"
                   v-if="!orderSet"
                 >
                   <b-icon icon="dash"/>
@@ -35,7 +35,7 @@
                   class="h5"
                   @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
                   v-if="!orderSet"
-                  :disabled="!dish.selectable"
+                  :disabled="!dish.selectable || !dish.addable"
                 >
                   <b-icon icon="plus"/>
                 </b-button>

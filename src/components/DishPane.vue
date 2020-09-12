@@ -101,7 +101,7 @@
                         class="add-remove-button"
                         :variant="dishes[index + 1].selectable ? 'outline-primary' : 'outline-secondary'"
                         @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount - 1, dishes[index + 1].orderCount)"
-                        :disabled="dishes[index + 1].orderCount === 0"
+                        :disabled="dishes[index + 1].orderCount === 0 || !dishes[index + 1].selectable"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="dash"/>
