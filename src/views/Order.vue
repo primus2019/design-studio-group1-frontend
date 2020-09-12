@@ -77,7 +77,14 @@
       </b-row>
     </div>
     <Prompter prompterId="orderPrompter" :promptText="promptText" @reset="promptText=null"/>
-    <Bill billModalId="billModalId" :dishes="dishes" @pay="pay"></Bill>
+    <Bill
+      billModalId="billModalId"
+      :dishes="dishes"
+      :paymentSet="paymentSet"
+      :discountPrice="discountPrice"
+      :isTakeout="false"
+      @pay="pay"
+    ></Bill>
     <b-modal
       id="orderTableIdModal"
       centered
@@ -88,20 +95,14 @@
       hide-header
       @ok.prevent="
       ![null, ''].includes(tableId) ?
-        $nextTick(() => $bvModal.hide('orderTableIdModal')) :
-        prompt('请输入桌号');"
+        $nextTick(() => { $bvModal.hide('orderTableIdModal'); findCurrentTable(); }) :
+        prompt('桌号不可为空');"
     >
       <b-form>
         <label class="table-id-label" for="orderTableIdInput">您的桌号</label>
         <b-form-input
           id="orderTableIdInput"
           v-model="tableId"
-          type="number"
-        ></b-form-input>
-        <label class="table-id-label" for="orderTableIdInput">您的手机</label>
-        <b-form-input
-          id="orderTelephoneInput"
-          v-model="telephone"
           type="number"
         ></b-form-input>
       </b-form>
@@ -142,7 +143,9 @@ export default {
       orderSet: false,
       paymentMethod: null,
       discountPrice: null,
-      telephone: null
+      telephone: null,
+      paymentSet: false,
+      currentDishes: null
     }
   },
   methods: {
@@ -174,6 +177,7 @@ export default {
     },
     // TODO: /api/dish_residue: request/response
     changeOrderCount (dishId, newOrderCount, oldOrderCount) {
+      this.dishes[this.dishIndex(dishId)].selectable = false
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
@@ -191,16 +195,20 @@ export default {
         .then((res) => {
           console.log('dish_residue response.data', res.data)
           this.handleSoldOut(res.data.dishes, oldOrderCount)
+          this.dishes[this.dishIndex(dishId)].selectable = true
         })
         .catch((err) => console.log(err))
     },
     handleSoldOut (dishes, oldOrderCount) {
       var soldOutList = []
       for (var i = 0; i < dishes.length; i++) {
+        var tmpIdx = this.dishIndex(dishes[i].dish_id)
         if (dishes[i].sold_out === 1) {
-          this.dishes[this.dishIndex(dishes[i].dish_id)].orderCount = oldOrderCount
-          this.dishes[this.dishIndex(dishes[i].dish_id)].selectable = false
+          this.dishes[tmpIdx].orderCount = oldOrderCount
+          this.dishes[tmpIdx].addable = false
           soldOutList.push(dishes[i].name)
+        } else {
+          this.dishes[tmpIdx].addable = true
         }
       }
       if (soldOutList.length !== 0) {
@@ -330,8 +338,14 @@ export default {
         tmpDish.type = allTypes.indexOf(dish.type)
         tmpDish.picture = dish.picture
         tmpDish.selectable = true
+        tmpDish.addable = true
         this.dishes.push(tmpDish)
       })
+      if (this.currentDishes) {
+        this.currentDishes.forEach((dish) => {
+          this.dishes[this.dishIndex(dish.dish_id)].orderCount = dish.count
+        })
+      }
     },
     totalPrice () {
       var tmpSum = 0
@@ -345,8 +359,13 @@ export default {
     //
     //
     //
-    pay (method) {
+    pay (method, telephone) {
+      this.telephone = telephone
       this.paymentMethod = method
+      if ([null, ''].includes(telephone)) {
+        this.prompt('请填写手机')
+        return
+      }
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8081/api/pay_table',
@@ -355,33 +374,38 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:5000/discount_payment',
+        url: 'http://124.70.178.153:5000/discount_payment/',
         data: {
           total_price: this.totalPrice(),
-          telephone: this.telephone,
+          telephone: this.telephone instanceof Number ? this.telephone.toString() : this.telephone,
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
           takeout_id: this.takeoutId
         }
       })
         .then((res) => {
+          console.log('discount_payment response.data', res.data)
           this.discountPrice = res.data.discount_price
+          this.confirmPayment()
         })
         .catch((err) => console.log(err))
+    },
+    confirmPayment () {
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8083/confirm_payment',
         data: {
           payment_method: this.paymentMethod,
-          telephone: this.telephone,
+          telephone: this.telephone instanceof Number ? this.telephone.toString() : this.telephone,
           discount_price: this.discountPrice,
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
           takeout_id: this.takeoutId,
-          time: this.getValidDateTime
+          time: this.getValidDateTime()
         }
       })
         .then((res) => {
           if (res.data.payment_status === 0) {
             this.prompt('支付成功')
+            this.paymentSet = true
           } else if (res.data.payment_status === 1) {
             this.prompt('支付失败')
           } else {
@@ -400,17 +424,54 @@ export default {
       var ss = String(today.getSeconds()).padStart(2, '0')
 
       return yyyy + mm + dd + ' ' + hh + ':' + MM + ':' + ss
+    },
+    // /api/current_table_status: request/response
+    findCurrentTable () {
+      console.log('current_table_status request', {
+        method: 'get',
+        url: 'http://124.70.178.153:8081/api/current_table_status',
+        params: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
+      })
+      axios({
+        method: 'get',
+        url: 'http://124.70.178.153:8081/api/current_table_status',
+        params: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
+      })
+        .then((res) => {
+          console.log('current_table_status response', res.data)
+          if (res.data.opened === 0) {
+            this.prompt('该桌未开台')
+            setTimeout(() => {
+              this.$bvModal.show('orderTableIdModal')
+            }, 600)
+          } else {
+            if (res.data.current_dishes) {
+              if (res.data.paid === 0) {
+                this.orderSet = true
+                this.prompt('恢复到已下单状态')
+              } else {
+                this.orderSet = true
+                this.paymentSet = true
+                this.prompt('恢复到已支付状态')
+              }
+              this.currentDishes = res.data.current_dishes
+            }
+            this.getDishes()
+          }
+        })
+    },
+    // /api/dish: request/response
+    getDishes () {
+      const path = 'http://124.70.178.153:8081/api/dish'
+      axios({
+        method: 'get',
+        url: path
+      })
+        .then(res => this.convertStaticDishes(res.data.dishes))
+        .catch(err => console.log(err))
     }
   },
-  // /api/dish: request/response
   mounted () {
-    const path = 'http://124.70.178.153:8081/api/dish'
-    axios({
-      method: 'get',
-      url: path
-    })
-      .then(res => this.convertStaticDishes(res.data.dishes))
-      .catch(err => console.log(err))
     this.$bvModal.show('orderTableIdModal')
   }
 }
