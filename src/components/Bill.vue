@@ -2,22 +2,34 @@
   <b-modal
     :id="billModalId"
     centered
-    hide-header
+    title="支付"
     scrollable
     button-size="lg"
   >
     <template v-slot:modal-footer>
       <b-container>
+        <b-row class="mb-3">
+          <b-form v-if="!isTakeout" style="width: 100%">
+            <label class="h5" for="orderTableIdInput">您的手机</label>
+            <b-form-input
+              id="orderTelephoneInput"
+              v-model="telephone"
+              type="number"
+            ></b-form-input>
+          </b-form>
+        </b-row>
         <b-row align-h="end">
           <b-button-group>
             <b-button
               variant="primary"
-              @click="$emit('pay', 'alipay')"
-            >Pay with AliPay</b-button>
+              @click="$emit('pay', 'alipay', telephone)"
+              :disabled="paymentSet"
+            >使用支付宝支付</b-button>
             <b-button
               variant="success"
-              @click="$emit('pay', 'wechat')"
-            >Pay with WeChat</b-button>
+              @click="$emit('pay', 'wechat', telephone)"
+              :disabled="paymentSet"
+            >使用微信支付</b-button>
           </b-button-group>
         </b-row>
       </b-container>
@@ -58,6 +70,22 @@
         </b-row>
       </b-container>
     </b-list-group-item>
+    <b-list-group-item v-if="discountPrice">
+      <b-container v-if="discountPrice">
+        <b-row align-h="between">
+          <b-col cols="3">
+            <b-row align-h="start">
+              <h4>折扣价</h4>
+            </b-row>
+          </b-col>
+          <b-col cols="4">
+            <b-row align-h="end">
+              <h4>￥{{ this.discountPrice }}</h4>
+            </b-row>
+          </b-col>
+        </b-row>
+      </b-container>
+    </b-list-group-item>
   </b-modal>
 </template>
 
@@ -75,11 +103,22 @@ export default {
     billModalId: {
       type: String,
       default: 'billModalId'
+    },
+    paymentSet: {
+      type: Boolean,
+      default: false
+    },
+    isTakeout: {
+      type: Boolean
+    },
+    discountPrice: {
+      type: Number
     }
   },
   data () {
     return {
-      localDishes: this.dishes
+      localDishes: this.dishes,
+      telephone: null
     }
   },
   methods: {

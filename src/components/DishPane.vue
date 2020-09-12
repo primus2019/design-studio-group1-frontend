@@ -38,7 +38,7 @@
                         class="add-remove-button"
                         :variant="dish.selectable ? 'outline-primary' : 'outline-secondary'"
                         @click="changeOrderCount(dish.dish_id, dish.orderCount - 1)"
-                        :disabled="dish.orderCount === 0"
+                        :disabled="dish.orderCount === 0 || !dish.selectable"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="dash"/>
@@ -46,9 +46,9 @@
                       <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dish.orderCount }}</label>
                       <b-button
                         class="add-remove-button"
-                        :variant="dish.selectable ? 'primary' : 'secondary'"
+                        :variant="dish.selectable && dish.addable ? 'primary' : 'secondary'"
                         @click="changeOrderCount(dish.dish_id, dish.orderCount + 1)"
-                        :disabled="!dish.selectable"
+                        :disabled="!dish.selectable || !dish.addable"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="plus"/>
@@ -109,9 +109,9 @@
                       <label style="text-align:center;vertical-align:bottom;margin-bottom:0;font-size:12pt;" class="ml-2 mr-2">{{ dishes[index + 1].orderCount }}</label>
                       <b-button
                         class="add-remove-button"
-                        :variant="dishes[index + 1].selectable ? 'primary' : 'secondary'"
+                        :variant="dishes[index + 1].selectable && dishes[index + 1].addable ? 'primary' : 'secondary'"
                         @click="changeOrderCount(dishes[index + 1].dish_id, dishes[index + 1].orderCount + 1, dishes[index + 1].orderCount)"
-                        :disabled="!dishes[index + 1].selectable"
+                        :disabled="!dishes[index + 1].selectable || !dishes[index + 1].addable"
                         v-if="!orderSet"
                       >
                         <b-icon scale="0.8" class="add-remove-icon" icon="plus"/>

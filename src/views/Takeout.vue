@@ -69,7 +69,13 @@
     </div>
     <TakeoutInfoForm id="takeoutInfoForm" :disable="orderSet" @submit="handleTakeoutInfo"/>
     <Prompter prompterId="orderPrompter" :promptText="promptText" @reset="promptText=null"/>
-    <Bill billModalId="billModalId" :dishes="dishes" @pay="pay"></Bill>
+    <Bill
+      billModalId="billModalId"
+      :dishes="dishes"
+      :paymentSet="paymentSet"
+      :isTakeout="true"
+      @pay="pay"
+    ></Bill>
   </div>
 </template>
 
@@ -107,7 +113,8 @@ export default {
       paymentMethod: null,
       name: null,
       phone: null,
-      address: null
+      address: null,
+      paymentSet: false
     }
   },
   methods: {
@@ -139,6 +146,7 @@ export default {
     },
     // TODO: /api/dish_residue: request/response
     changeOrderCount (dishId, newOrderCount, oldOrderCount) {
+      this.dishes[this.dishIndex(dishId)].selectable = false
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
@@ -156,20 +164,24 @@ export default {
         .then((res) => {
           console.log('dish_residue response.data', res.data)
           this.handleSoldOut(res.data.dishes, oldOrderCount)
+          this.dishes[this.dishIndex(dishId)].selectable = true
         })
         .catch((err) => console.log(err))
     },
     handleSoldOut (dishes, oldOrderCount) {
       var soldOutList = []
       for (var i = 0; i < dishes.length; i++) {
+        var tmpIdx = this.dishIndex(dishes[i].dish_id)
         if (dishes[i].sold_out === 1) {
-          this.dishes[this.dishIndex(dishes[i].dish_id)].orderCount = oldOrderCount
-          this.dishes[this.dishIndex(dishes[i].dish_id)].selectable = false
+          this.dishes[tmpIdx].orderCount = oldOrderCount
+          this.dishes[tmpIdx].addable = false
           soldOutList.push(dishes[i].name)
+        } else {
+          this.dishes[tmpIdx].addable = true
         }
       }
       if (soldOutList.length !== 0) {
-        this.prompt(soldOutList.join(','), '已售罄!')
+        this.prompt(soldOutList.join(',') + '已售罄!')
       }
     },
     // /api/add_order: request/response (order only for now)
@@ -305,6 +317,7 @@ export default {
         tmpDish.type = allTypes.indexOf(dish.type)
         tmpDish.picture = dish.picture
         tmpDish.selectable = true
+        tmpDish.addable = true
         this.dishes.push(tmpDish)
       })
     },
@@ -316,34 +329,40 @@ export default {
       return tmpSum
     },
     // TODO: /g3/confirm_payment: request/response
-    pay (method) {
+    pay (method, telephone) {
       this.paymentMethod = method
       axios({
         method: 'post',
-        url: 'http://124.70.178.153:8081/pay_table',
-        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
-      })
-        .catch((err) => console.log(err))
-      axios({
-        method: 'post',
-        url: 'http://124.70.178.153:5000/discount_payment',
+        url: 'http://124.70.178.153:5000/discount_payment/',
         data: {
           total_price: this.totalPrice(),
-          telephone: this.telephone,
+          telephone: this.phone,
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
           takeout_id: this.takeoutId
         }
       })
         .then((res) => {
+          console.log('discount_payment response.data', res.data)
           this.discountPrice = res.data.discount_price
+          this.confirmPayment()
         })
         .catch((err) => console.log(err))
+    },
+    confirmPayment () {
+      console.log('confirm_payment request', {
+        payment_method: this.paymentMethod,
+        telephone: this.phone,
+        discount_price: this.discountPrice,
+        table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+        takeout_id: this.takeoutId,
+        time: this.getValidDateTime()
+      })
       axios({
         method: 'post',
         url: 'http://124.70.178.153:8083/confirm_payment',
         data: {
           payment_method: this.paymentMethod,
-          telephone: this.telephone,
+          telephone: this.phone,
           discount_price: this.discountPrice,
           table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
           takeout_id: this.takeoutId,
@@ -351,8 +370,10 @@ export default {
         }
       })
         .then((res) => {
+          console.log('confirm_payment response.data', res.data)
           if (res.data.payment_status === 0) {
             this.prompt('支付成功')
+            this.paymentSet = true
           } else if (res.data.payment_status === 1) {
             this.prompt('支付失败')
           } else {
