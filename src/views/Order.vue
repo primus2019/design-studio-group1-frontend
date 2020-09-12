@@ -98,6 +98,12 @@
           v-model="tableId"
           type="number"
         ></b-form-input>
+        <label class="table-id-label" for="orderTableIdInput">您的手机</label>
+        <b-form-input
+          id="orderTelephoneInput"
+          v-model="telephone"
+          type="number"
+        ></b-form-input>
       </b-form>
     </b-modal>
   </div>
@@ -289,7 +295,7 @@ export default {
               break
             case 1:
               this.prompt('菜品删除成功')
-              this.dishes[this.dishIndex(dishId)] -= 1
+              this.dishes[this.dishIndex(dishId)].orderCount -= 1
               break
             default:
               this.prompt('bug: unexpected success in remove_order', res.data.success)
