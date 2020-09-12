@@ -17,6 +17,7 @@
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
+            :isTakeout="true"
             @change="changeOrderCount"
             @remove="removeOrder"
           ></DishPane>
@@ -37,6 +38,7 @@
               orderDetailModalId="orderDetailModalId"
               :orderSet="orderSet"
               :dishes="dishes"
+              :isTakeout="true"
               @change="changeOrderCount"
             ></OrderDetail>
           </b-row>
@@ -97,7 +99,7 @@ export default {
       orderLogoDir: 'order.png',
       orderFluid: true,
       dishes: [],
-      takeoutId: -1,
+      takeoutId: null,
       promptText: null,
       tableId: null,
       orderTableIdDisable: false,
@@ -126,17 +128,10 @@ export default {
       }
       return tmpSum.toString()
     },
-    extendDishesDict (tmpDish) {
-      for (var i = 0; i < this.dishes.length; i++) {
-        tmpDish.orderCount = i
-        tmpDish.price = 1
-        this.dishes[i] = tmpDish
-      }
-    },
     dishIndex (dishId) {
       for (var i = 0; i < this.dishes.length; i++) {
         if (this.dishes[i].dish_id === dishId) {
-          return this.dishes[i].dish_id
+          return i
         }
       }
       this.prompt('Fail to find dish id')
@@ -147,43 +142,35 @@ export default {
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
+      if (newOrder.length === 0) { return }
       console.log('dish_residue request', {
         method: 'get',
-        url: 'http://localhost:8081/api/dish_residue',
+        url: 'http://124.70.178.153:8081/api/dish_residue',
         params: { dishes: newOrder }
       })
       axios({
         method: 'get',
-        url: 'http://localhost:8081/api/dish_residue',
+        url: 'http://124.70.178.153:8081/api/dish_residue',
         params: { dishes: newOrder }
       })
         .then((res) => {
           console.log('dish_residue response.data', res.data)
-          const soldOut = this.handleSoldout(res.data.dishes, dishId, newOrderCount)
-          if (soldOut) {
-            this.dishes.forEach((dish) => {
-              if (dish.dish_id === dishId) {
-                dish.orderCount = oldOrderCount
-              }
-            })
-          }
+          this.handleSoldOut(res.data.dishes, oldOrderCount)
         })
         .catch((err) => console.log(err))
     },
-    handleSoldout (dishes) {
-      for (const [dish, index] in dishes) {
-        var soldOutList = []
-        if (dish.sold_out === 1) {
-          this.dishes[index].orderCount = 0
-          this.dishes[index].selectable = false
-          this.soldOutList.push(dish.name)
-        }
-        if (soldOutList.length !== 0) {
-          this.prompt(soldOutList.join(','), 'has sold out!')
-          return true
+    handleSoldOut (dishes, oldOrderCount) {
+      var soldOutList = []
+      for (var i = 0; i < dishes.length; i++) {
+        if (dishes[i].sold_out === 1) {
+          this.dishes[this.dishIndex(dishes[i].dish_id)].orderCount = oldOrderCount
+          this.dishes[this.dishIndex(dishes[i].dish_id)].selectable = false
+          soldOutList.push(dishes[i].name)
         }
       }
-      return false
+      if (soldOutList.length !== 0) {
+        this.prompt(soldOutList.join(','), '已售罄!')
+      }
     },
     // /api/add_order: request/response (order only for now)
     // it should use the table related api
@@ -193,18 +180,24 @@ export default {
         .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
       console.log('add_order request', {
         method: 'post',
-        url: 'http://localhost:8081/api/add_order',
-        data: { table_id: this.tableId, dishes: newOrder }
+        url: 'http://124.70.178.153:8081/api/add_order',
+        data: {
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          dishes: newOrder
+        }
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/add_order',
-        data: { table_id: this.tableId, dishes: newOrder }
+        url: 'http://124.70.178.153:8081/api/add_order',
+        data: {
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          dishes: newOrder
+        }
       })
         .then((res) => {
           console.log('add_order response.data', res.data)
           if (res.data.success === 1) {
-            this.prompt('Your orders are all set!')
+            this.prompt('下单成功!')
             this.orderSet = true
           } else {
             var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
@@ -232,28 +225,28 @@ export default {
         .map(dish => { return { dish_id: dish.dish_id, count: dish.orderCount } })
       console.log('parent add_takeout request', {
         method: 'post',
-        url: 'http://localhost:8081/api/add_takeout',
+        url: 'http://124.70.178.153:8081/api/add_takeout',
         data: {
           dishes: newOrder,
           name: this.name,
-          phone: this.phone,
+          telephone: this.phone,
           address: this.address
         }
       })
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/add_takeout',
+        url: 'http://124.70.178.153:8081/api/add_takeout',
         data: {
           dishes: newOrder,
           name: this.name,
-          phone: this.phone,
+          telephone: this.phone,
           address: this.address
         }
       })
         .then((res) => {
           console.log('parent add_takeout response.data', res.data)
           if (res.data.success === 1) {
-            this.prompt('Your takeouts are all set!')
+            this.prompt('下单成功!')
             this.orderSet = true
             this.takeoutId = res.data.takeout_id
             setTimeout(() => {
@@ -270,19 +263,16 @@ export default {
     removeOrder (dishId) {
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/remove_order',
+        url: 'http://124.70.178.153:8081/api/remove_order',
         data: {
-          table_id: this.tableId,
-          dishes: {
-            dish_id: dishId,
-            count: 1
-          }
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          dishes: [{ dish_id: dishId, count: 1 }]
         }
       })
         .then((res) => {
           if (res.data.success === 1) {
             this.prompt('菜品删除成功')
-            this.dishes[dishId].orderCount -= 1
+            this.dishes[this.dishIndex(dishId)].orderCount -= 1
           } else if (res.data.success === 0) {
             this.prompt('菜品删除失败')
           }
@@ -293,8 +283,8 @@ export default {
     nudge (dishId) {
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/nudge',
-        data: { table_id: this.tableId }
+        url: 'http://124.70.178.153:8081/api/nudge',
+        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
       })
         .catch((err) => console.log(err))
     },
@@ -330,17 +320,18 @@ export default {
       this.paymentMethod = method
       axios({
         method: 'post',
-        url: 'http://localhost:8081/api/pay_table',
-        data: { table_id: this.tableId }
+        url: 'http://124.70.178.153:8081/pay_table',
+        data: { table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId) }
       })
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://localhost:8081/g3/discount_payment',
+        url: 'http://124.70.178.153:5000/discount_payment',
         data: {
           total_price: this.totalPrice(),
           telephone: this.telephone,
-          table_id: this.tableId
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          takeout_id: this.takeoutId
         }
       })
         .then((res) => {
@@ -349,21 +340,37 @@ export default {
         .catch((err) => console.log(err))
       axios({
         method: 'post',
-        url: 'http://localhost:8081/g3/confirm_payment',
+        url: 'http://124.70.178.153:8083/confirm_payment',
         data: {
           payment_method: this.paymentMethod,
-          telephone: this.telephone
+          telephone: this.telephone,
+          discount_price: this.discountPrice,
+          table_id: this.tableId instanceof Number ? this.tableId : parseInt(this.tableId),
+          takeout_id: this.takeoutId,
+          time: this.getValidDateTime()
         }
       })
         .then((res) => {
           if (res.data.payment_status === 0) {
-            this.prompt('Your purchase is all set.')
+            this.prompt('支付成功')
           } else if (res.data.payment_status === 1) {
-            this.prompt('Your purchase fails; ask the servants for help.')
+            this.prompt('支付失败')
           } else {
-            this.prompt('bug: unexpected payment_status in /g3/confirm_status: ', res.data.payment_status)
+            this.prompt('bug: unexpected payment_status in /confirm_status: ', res.data.payment_status)
           }
         })
+    },
+    getValidDateTime () {
+      var today = new Date()
+      today.setDate(today.getDate())
+      var dd = String(today.getDate()).padStart(2, '0')
+      var mm = String(today.getMonth() + 1).padStart(2, '0')
+      var yyyy = today.getFullYear()
+      var hh = String(today.getHours()).padStart(2, '0')
+      var MM = String(today.getMinutes()).padStart(2, '0')
+      var ss = String(today.getSeconds()).padStart(2, '0')
+
+      return yyyy + mm + dd + ' ' + hh + ':' + MM + ':' + ss
     },
     handleTakeoutInfo (info) {
       this.name = info.name
@@ -373,7 +380,7 @@ export default {
   },
   // /api/dish: request/response
   mounted () {
-    const path = 'http://localhost:8081/api/dish'
+    const path = 'http://124.70.178.153:8081/api/dish'
     axios({
       method: 'get',
       url: path

@@ -7,7 +7,7 @@
       @click="search"
       class="search-table-button"
     >
-      Search
+      搜索
     </b-button>
   </div>
 </template>
