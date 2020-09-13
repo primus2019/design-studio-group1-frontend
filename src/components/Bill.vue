@@ -14,6 +14,7 @@
             <b-form-input
               id="orderTelephoneInput"
               v-model="telephone"
+              :disabled="paymentSet"
               type="number"
             ></b-form-input>
           </b-form>

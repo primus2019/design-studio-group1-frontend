@@ -56,6 +56,7 @@
                       <b-button
                         variant="outline-info"
                         v-if="orderSet && !isTakeout"
+                        :disabled="!dish.selectable || !dish.addable || paymentSet"
                         @click="$emit('add', dish.dish_id)"
                       >
                         加菜
@@ -63,6 +64,7 @@
                       <b-button
                         variant="outline-secondary"
                         v-if="dish.orderCount !== 0 && orderSet && !isTakeout"
+                        :disabled="dish.orderCount === 0 || !dish.selectable || paymentSet"
                         @click="$emit('remove', dish.dish_id)"
                       >
                         删菜
