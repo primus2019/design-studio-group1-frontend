@@ -248,6 +248,7 @@ export default {
         .catch((err) => console.log(err))
     },
     addOrderAfterSet (dishId) {
+      this.dishes[this.dishIndex(dishId)].selectable = false
       console.log('add_order(after set) request', {
         method: 'post',
         url: 'http://124.70.178.153:8081/api/add_order',
@@ -272,13 +273,19 @@ export default {
             this.dishes[this.dishIndex(dishId)].orderCount += 1
           } else {
             var soldOutList = res.data.fail_dishes.map((dish) => this.getDishName(dish.dish_id))
-            this.prompt(soldOutList.join(','), '已售罄!')
+            this.prompt(soldOutList.join(',') + '已售罄!')
+            this.dishes[this.dishIndex(dishId)].addable = false
           }
+          this.dishes[this.dishIndex(dishId)].selectable = true
         })
         .catch((err) => console.log(err))
     },
+    getDishName (dishId) {
+      return this.dishes[this.dishIndex(this.dishes)].name
+    },
     // TODO: /api/remove_order: request/response
     removeOrder (dishId) {
+      this.dishes[this.dishIndex(dishId)].selectable = false
       console.log('remove_order request', {
         method: 'post',
         url: 'http://124.70.178.153:8081/api/remove_order',
@@ -308,6 +315,7 @@ export default {
             default:
               this.prompt('bug: unexpected success in remove_order', res.data.success)
           }
+          this.dishes[this.dishIndex(dishId)].selectable = true
         })
         .catch((err) => console.log(err))
     },

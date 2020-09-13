@@ -271,6 +271,9 @@ export default {
         })
         .catch((err) => console.log(err))
     },
+    getDishName (dishId) {
+      return this.dishes[this.dishIndex(this.dishes)].name
+    },
     // TODO: /api/remove_dish: request/response
     removeOrder (dishId) {
       axios({
