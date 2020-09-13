@@ -119,7 +119,7 @@
                       <b-button
                         variant="outline-info"
                         v-if="orderSet && !isTakeout"
-                        :disabled="!dishes[index + 1].selectable || !dishes[index + 1].addable"
+                        :disabled="!dishes[index + 1].selectable || !dishes[index + 1].addable || paymentSet"
                         @click="$emit('add', dishes[index + 1].dish_id)"
                       >
                         加菜
@@ -127,7 +127,7 @@
                       <b-button
                         variant="outline-secondary"
                         v-if="dishes[index + 1].orderCount !== 0 && orderSet && !isTakeout"
-                        :disabled="dishes[index + 1].orderCount === 0 || !dishes[index + 1].selectable"
+                        :disabled="dishes[index + 1].orderCount === 0 || !dishes[index + 1].selectable || paymentSet"
                         @click="$emit('remove', dishes[index + 1].dish_id)"
                       >
                         删菜
@@ -149,6 +149,9 @@ export default {
   name: 'DishPane',
   props: {
     orderSet: {
+      type: Boolean
+    },
+    paymentSet: {
       type: Boolean
     },
     dishes: {

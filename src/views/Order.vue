@@ -17,6 +17,7 @@
           <DishPane
             :dishes="dishes"
             :orderSet="orderSet"
+            :paymentSet="paymentSet"
             :isTakeout="false"
             @change="changeOrderCount"
             @remove="removeOrder"
@@ -38,6 +39,7 @@
             <OrderDetail
               orderDetailModalId="orderDetailModalId"
               :orderSet="orderSet"
+              :paymentSet="paymentSet"
               :dishes="dishes"
               :isTakeout="false"
               @change="changeOrderCount"
@@ -181,7 +183,10 @@ export default {
       const newOrder = this.dishes
         .filter((dish) => dish.orderCount > 0)
         .map((dish) => { return { dish_id: dish.dish_id, count: dish.orderCount } })
-      if (newOrder.length === 0) { return }
+      if (newOrder.length === 0) {
+        this.dishes[this.dishIndex(dishId)].selectable = true
+        return
+      }
       console.log('dish_residue request', {
         method: 'get',
         url: 'http://124.70.178.153:8081/api/dish_residue',

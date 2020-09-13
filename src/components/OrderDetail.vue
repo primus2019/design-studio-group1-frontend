@@ -42,6 +42,7 @@
                 <b-button
                   variant="outline-primary"
                   class="h5"
+                  :disabled="paymentSet"
                   @click="$emit('add', dish.dish_id)"
                   v-if="orderSet && !isTakeout"
                 >
@@ -50,6 +51,7 @@
                 <b-button
                   variant="primary"
                   class="h5"
+                  :disabled="paymentSet"
                   @click="$emit('remove', dish.dish_id)"
                   v-if="orderSet && !isTakeout"
                 >
@@ -87,6 +89,9 @@ export default {
       default: 'orderDetailModalId'
     },
     orderSet: {
+      type: Boolean
+    },
+    paymentSet: {
       type: Boolean
     },
     isTakeout: {
